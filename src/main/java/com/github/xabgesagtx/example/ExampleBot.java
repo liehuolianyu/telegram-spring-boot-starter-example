@@ -15,11 +15,13 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import com.github.xabgesagtx.example.utils.httpsPost;
+import com.github.xabgesagtx.example.utils.*;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +34,9 @@ public class ExampleBot extends TelegramLongPollingBot {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExampleBot.class);
 
+	private static final Integer ALL_Count = 1000000;
+
+	private static final String FILE_PATH = "/home/yangzi/software/cloudSee/";
 
 	public  ExampleBot(){
 /*		DefaultBotOptions options = new DefaultBotOptions();
@@ -106,8 +111,49 @@ public class ExampleBot extends TelegramLongPollingBot {
 					sql.append("操作失败，请查看日志");
 					response.setText(sql.toString());
 				}
-			} else {
+			}
+			else  if (text.startsWith("H")){
+				String startHead = text.substring(0,1);
+				String[] tmp = text.split(";");
+				Integer allCount = 0;
+				Integer startNum = 0;
+				if (tmp.length==2){
+					allCount = Integer.valueOf(tmp[1]);
+					startNum = Integer.valueOf(tmp[0].trim().substring(1));
+				}else {
+					allCount = ALL_Count;
+					startNum = Integer.valueOf(text.trim().substring(1));
+				}
+				Integer endNUm = startNum+allCount;
+				String url = "http://bbs.cloudsee.com/service/yst-online?cloudNum=";
+				Connection.Response resp = null;
+				List<String> result = new ArrayList<>();
+				try {
+					for (;startNum<=endNUm;startNum++){
+						resp = httpsPost.get(url+startHead+startNum);
+						if ("200".equals(String.valueOf(resp.statusCode()))){
+							logger.info(startHead+startNum+"："+resp.body());
+							//logger.info(JSONObject.parseObject(resp.body()).getString("onln"));
+							if (JSONObject.parseObject(resp.body()).getString("onln").equals("1")){
+								result.add(startHead+startNum);
+							}
+						}
+						if (result.size()>30){
+							logger.info("已扫描超过30个，先写入文件，最后扫描值为："+startNum);
+							fileUtils.FileWriteListforTure(FILE_PATH+startHead+endNUm+".txt",result);
+							result.clear();
+						}
+					}
 
+				response.setText("成功扫描并存入文件");
+				} catch (IOException e) {
+					logger.error(e.toString());
+					response.setText("error");
+				}
+
+
+			}
+				else{
 				response.setText(text);
 			}
 			try {
