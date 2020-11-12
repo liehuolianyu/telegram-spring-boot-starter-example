@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.ApiConstants;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -134,16 +135,21 @@ public class ExampleBot extends TelegramLongPollingBot {
 						if ("200".equals(String.valueOf(resp.statusCode()))){
 							logger.info(startHead+startNum+"："+resp.body());
 							//logger.info(JSONObject.parseObject(resp.body()).getString("onln"));
+							if(!StringUtils.isEmpty(JSONObject.parseObject(resp.body()).getString("onln"))){
 							if (JSONObject.parseObject(resp.body()).getString("onln").equals("1")){
 								result.add(startHead+startNum);
 							}
+							}
 						}
-						if (result.size()>30){
-							logger.info("已扫描超过30个，先写入文件，最后扫描值为："+startNum);
+						if (result.size()>10){
+							logger.info("已扫描超过10个，先写入文件，最后扫描值为："+startNum);
 							fileUtils.FileWriteListforTure(FILE_PATH+startHead+endNUm+".txt",result);
 							result.clear();
 						}
 					}
+					logger.info("已扫描完成，写入文件，最后扫描值为："+startNum);
+					fileUtils.FileWriteListforTure(FILE_PATH+startHead+endNUm+".txt",result);
+					result.clear();
 
 				response.setText("成功扫描并存入文件");
 				} catch (IOException e) {
