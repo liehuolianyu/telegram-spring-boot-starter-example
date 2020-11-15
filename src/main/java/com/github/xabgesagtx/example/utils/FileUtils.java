@@ -1,21 +1,34 @@
 package com.github.xabgesagtx.example.utils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.List;
-public class fileUtils {
+public class FileUtils {
+
+    private static String charsetCode = "utf-8";
 
     /**
      * 字符流写入字符串到txt
      */
 
-    public static void FileString(String path, String data) {
+    public static void FileString(String path, String data,boolean isoverride) {
+        FileWriter writer = null;
         try {
-            FileWriter writer = new FileWriter(path);// 字符流
+            writer = new FileWriter(path,isoverride);// 字符流
             writer.write(data);
-            writer.close();
+
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }finally {
+            try {
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -157,6 +170,7 @@ public class fileUtils {
                 bufferedWriter.flush();
             }
             bufferedWriter.close();
+            list.clear();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
@@ -281,5 +295,178 @@ public class fileUtils {
             e.printStackTrace();
         }
         return buffer.toString();
+    }
+
+    /**
+     * 下载文件
+     * @param path 文件的位置
+     * @param fileName 自定义下载文件的名称
+     * @param resp http响应
+     * @param req http请求
+     */
+    public static void downloadFile(String path, String fileName, HttpServletResponse resp, HttpServletRequest req){
+        try {
+            File file = new File(path);
+            /**
+             * 中文乱码解决
+             */
+            String type = req.getHeader("User-Agent").toLowerCase();
+            if(type.indexOf("firefox")>0 || type.indexOf("chrome")>0){
+                /**
+                 * 谷歌或火狐
+                 */
+                fileName = new String(fileName.getBytes(charsetCode), "iso8859-1");
+            }else{
+                /**
+                 * IE
+                 */
+                fileName = URLEncoder.encode(fileName, charsetCode);
+            }
+            // 设置响应的头部信息
+            resp.setHeader("content-disposition", "attachment;filename=" + fileName);
+            // 设置响应内容的类型
+            resp.setContentType(getFileContentType(fileName)+"; charset=" + charsetCode);
+            // 设置响应内容的长度
+            resp.setContentLength((int) file.length());
+            // 输出
+            outStream(new FileInputStream(file), resp.getOutputStream());
+        } catch (Exception e) {
+            System.out.println("执行downloadFile发生了异常：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 文件的内容类型
+     */
+    private static String getFileContentType(String name){
+        String result = "";
+        String fileType = name.toLowerCase();
+        if (fileType.endsWith(".png")) {
+            result = "image/png";
+        } else if (fileType.endsWith(".gif")) {
+            result = "image/gif";
+        } else if (fileType.endsWith(".jpg") || fileType.endsWith(".jpeg")) {
+            result = "image/jpeg";
+        } else if(fileType.endsWith(".svg")){
+            result = "image/svg+xml";
+        }else if (fileType.endsWith(".doc")) {
+            result = "application/msword";
+        } else if (fileType.endsWith(".xls")) {
+            result = "application/x-excel";
+        } else if (fileType.endsWith(".zip")) {
+            result = "application/zip";
+        } else if (fileType.endsWith(".pdf")) {
+            result = "application/pdf";
+        } else {
+            result = "application/octet-stream";
+        }
+        return result;
+    }
+
+    /**
+     * 基础字节数组输出
+     */
+    private static void outStream(InputStream is, OutputStream os) {
+        try {
+            byte[] buffer = new byte[10240];
+            int length = -1;
+            while ((length = is.read(buffer)) != -1) {
+                os.write(buffer, 0, length);
+                os.flush();
+            }
+        } catch (Exception e) {
+            System.out.println("执行 outStream 发生了异常：" + e.getMessage());
+        } finally {
+            try {
+                os.close();
+            } catch (IOException e) {
+            }
+            try {
+                is.close();
+            } catch (IOException e) {
+            }
+        }
+    }
+
+
+    /**
+     * 处理cloudsee文件
+     * @param file
+     * @return
+     */
+    public static String deal(File file){
+        StringBuffer sbf = new StringBuffer();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String tempStr;
+            int i = 0;
+            int j = 1;
+            insert(sbf,"<Groups>");
+            insert(sbf,"<Group name=\"NewGroup"+0+ "\" CurGroup=\"true\">");
+            while ((tempStr = reader.readLine()) != null) {
+                if(i==36){
+                    insert(sbf,"</Group>");
+                    insert(sbf,"<Group name=\"NewGroup"+j+ "\" CurGroup=\"true\">");
+                    j++;
+                    i=0;
+                }
+                todo(sbf,tempStr);
+                i++;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        insert(sbf,"</Group>");
+        insert(sbf,"</Groups>");
+        return sbf.toString();
+    }
+
+    /**
+     * 拼接字符时插入空行
+     * @param stringBuffer
+     * @param str
+     */
+    public static void insert(StringBuffer stringBuffer,String str){
+        stringBuffer.append(str);
+        stringBuffer.append("\r\n");
+    }
+
+    /**
+     * 组装cloudsee数据
+     * @param stringBuffer
+     * @param no
+     */
+    public static void todo(StringBuffer stringBuffer,String no){
+        insert(stringBuffer,"<Source name=\""+no+"\">");
+        insert(stringBuffer,"<IP>192.168.8.128</IP>");
+        insert(stringBuffer,"<Port>9101</Port>");
+        insert(stringBuffer,"<NetUser>616361</NetUser>");
+        insert(stringBuffer,"<Password>313331</Password>");
+        insert(stringBuffer,"<bOutWindow>1</bOutWindow>");
+        insert(stringBuffer,"<bAlarm>1</bAlarm>");
+        insert(stringBuffer,"<bEnablePreview>1</bEnablePreview>");
+        insert(stringBuffer,"<bIPCMode>0</bIPCMode>");
+        insert(stringBuffer,"<bOrShow>0</bOrShow>");
+        insert(stringBuffer,"<bOnlyIP>0</bOnlyIP>");
+        insert(stringBuffer,"<bUseYstPort>0</bUseYstPort>");
+        insert(stringBuffer,"<bUseLanChk>0</bUseLanChk>");
+        insert(stringBuffer,"<CloudSEEVersion>0</CloudSEEVersion>");
+        insert(stringBuffer,"<CloudSEEID>"+no+"</CloudSEEID>");
+        insert(stringBuffer,"<Channel>1</Channel>");
+        insert(stringBuffer,"<Stream>2</Stream>");
+        insert(stringBuffer,"<Protocol>0</Protocol>");
+        insert(stringBuffer,"<bDecodeOut>0</bDecodeOut>");
+        insert(stringBuffer,"<nDecodeOut>1</nDecodeOut>");
+        insert(stringBuffer," <nDecodePos>0</nDecodePos>");
+        insert(stringBuffer,"<bMatrixOut>0</bMatrixOut>");
+        insert(stringBuffer,"<nMatrixOut>1</nMatrixOut>");
+        insert(stringBuffer," <nMatrixPos>0</nMatrixPos>");
+        insert(stringBuffer," <bAutoConnect>1</bAutoConnect>");
+        insert(stringBuffer,"<bAutoRecord>0</bAutoRecord>");
+        insert(stringBuffer,"<bAutoSnapshotAlarm>0</bAutoSnapshotAlarm>");
+        insert(stringBuffer," <bAutoEMap>0</bAutoEMap>");
+        insert(stringBuffer," </Source>");
     }
 }

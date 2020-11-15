@@ -2,15 +2,14 @@ package com.github.xabgesagtx.example;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.http.client.protocol.HttpClientContext;
+import com.github.xabgesagtx.example.Service.DealCloudSee;
 import org.jsoup.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
-import org.telegram.telegrambots.meta.ApiConstants;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -20,10 +19,9 @@ import com.github.xabgesagtx.example.utils.*;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 
@@ -35,9 +33,20 @@ public class ExampleBot extends TelegramLongPollingBot {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExampleBot.class);
 
-	private static final Integer ALL_Count = 1000000;
+	@Value("${file.count}")
+	private  Integer ALL_Count;
 
-	private static final String FILE_PATH = "/home/yangzi/software/cloudSee/";
+	@Value("${file.sleep}")
+	private Long SLEEP_TIME;
+
+	@Autowired
+	private  DealCloudSee dealCloudSee;
+
+
+
+	/*private static final String FILE_PATH = "/home/yangzi/software/cloudSee/";*/
+	@Value("${file.outputpath}")
+	private  String FILE_PATH ;
 
 	public  ExampleBot(){
 /*		DefaultBotOptions options = new DefaultBotOptions();
@@ -114,6 +123,7 @@ public class ExampleBot extends TelegramLongPollingBot {
 				}
 			}
 			else  if (text.startsWith("H")){
+				ReentrantLock lock = new ReentrantLock();
 				String startHead = text.substring(0,1);
 				String[] tmp = text.split(";");
 				Integer allCount = 0;
@@ -126,36 +136,51 @@ public class ExampleBot extends TelegramLongPollingBot {
 					startNum = Integer.valueOf(text.trim().substring(1));
 				}
 				Integer endNUm = startNum+allCount;
-				String url = "http://bbs.cloudsee.com/service/yst-online?cloudNum=";
-				Connection.Response resp = null;
-				List<String> result = new ArrayList<>();
-				try {
-					for (;startNum<=endNUm;startNum++){
-						resp = httpsPost.get(url+startHead+startNum);
-						if ("200".equals(String.valueOf(resp.statusCode()))){
-							logger.info(startHead+startNum+"："+resp.body());
-							//logger.info(JSONObject.parseObject(resp.body()).getString("onln"));
-							if(!StringUtils.isEmpty(JSONObject.parseObject(resp.body()).getString("onln"))){
-							if (JSONObject.parseObject(resp.body()).getString("onln").equals("1")){
-								result.add(startHead+startNum);
-							}
-							}
+				/*String url = "http://bbs.cloudsee.com/service/yst-online?cloudNum=";
+				Connection.Response resp = null;*/
+				List<String> result = new CopyOnWriteArrayList<>();
+				long startTime=System.currentTimeMillis();
+				for (;startNum<=endNUm;startNum++){
+					try {
+						dealCloudSee.execute(result,startHead+startNum);
+						Thread.sleep(SLEEP_TIME);
+					} catch (InterruptedException e) {
+						try {
+							Thread.sleep(20);
+						} catch (InterruptedException ex) {
+							ex.printStackTrace();
 						}
-						if (result.size()>10){
-							logger.info("已扫描超过10个，先写入文件，最后扫描值为："+startNum);
-							fileUtils.FileWriteListforTure(FILE_PATH+startHead+endNUm+".txt",result);
-							result.clear();
-						}
+						logger.info(e.getMessage());
 					}
-					logger.info("已扫描完成，写入文件，最后扫描值为："+startNum);
-					fileUtils.FileWriteListforTure(FILE_PATH+startHead+endNUm+".txt",result);
-					result.clear();
+					lock.lock();
+					if (result.size()>=10){
+							logger.info("已扫描超过10个，先写入文件，最后扫描值为："+startNum);
+							FileUtils.FileWriteListforTure(FILE_PATH+startHead+endNUm+".txt",result);
+					}
+					lock.unlock();
+				/*	resp = httpsPost.get(url+startHead+startNum);
+					if ("200".equals(String.valueOf(resp.statusCode()))){
+						logger.info(startHead+startNum+"："+resp.body());
+						//logger.info(JSONObject.parseObject(resp.body()).getString("onln"));
+						if(!StringUtils.isEmpty(JSONObject.parseObject(resp.body()).getString("onln"))){
+						if (JSONObject.parseObject(resp.body()).getString("onln").equals("1")){
+							result.add(startHead+startNum);
+						}
+						}
+					}*/
+					/*if (result.size()>10){
+						logger.info("已扫描超过10个，先写入文件，最后扫描值为："+startNum);
+						fileUtils.FileWriteListforTure(FILE_PATH+startHead+endNUm+".txt",result);
+						result.clear();
+					}*/
+				}
+				long endtime=System.currentTimeMillis();
+				logger.info(("程序运行时间： "+(endtime-startTime)+"ms"));
+				logger.info("已扫描完成，写入文件，最后扫描值为："+startNum);
+				FileUtils.FileWriteListforTure(FILE_PATH+startHead+endNUm+".txt",result);
+				result.clear();
 
 				response.setText("成功扫描并存入文件");
-				} catch (IOException e) {
-					logger.error(e.toString());
-					response.setText("error");
-				}
 
 
 			}

@@ -1,0 +1,19 @@
+xhpay:
+  front: linux
+
+bot:
+  token: 1375825521:AAEU1pio1gsTxp4glYVV6x1q5VktDDck7Ys
+  username: fulihao_bot
+
+file:
+  #outputpath: C:\\Users\\Administrator\\Documents\\
+  outputpath: /home/yangzi/software/cloudSee/
+  downloadpath: /home/yangzi/software/cloudSee/Group.cfg
+  count: 2000000
+  sleep: 50
+
+server:
+  #端口号
+  port: 8081
+  #项目名，如果不设定，默认是 /
+  #context-path: /demo
