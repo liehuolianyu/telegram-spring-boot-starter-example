@@ -2,6 +2,7 @@ package com.github.xabgesagtx.example.Controller;
 
 import com.github.xabgesagtx.example.Service.DealCloudSee;
 import com.github.xabgesagtx.example.utils.FileUtils;
+import com.github.xabgesagtx.example.utils.MyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,8 @@ public class CloudSeeController {
 
     @Async
     @GetMapping(value = "/scan")
-    public void scanner(HttpServletRequest request,HttpServletResponse response){
+    public MyResponse scanner(HttpServletRequest request){
+        MyResponse myResponse= new MyResponse(200,true);
         String startName = request.getParameter("fileName");
         if (!StringUtils.isEmpty(startName)){
             ReentrantLock lock = new ReentrantLock();
@@ -119,10 +121,11 @@ public class CloudSeeController {
             FileUtils.FileWriteListforTure(cloudPath+startHead+endNUm+".txt",result);
             result.clear();
 
-            response.setStatus(200);
-        }else {
-            response.setStatus(9999);
-        }
 
+        }else {
+            myResponse.setCode(9999);
+            myResponse.setSuccess(false);
+        }
+        return myResponse;
     }
 }
