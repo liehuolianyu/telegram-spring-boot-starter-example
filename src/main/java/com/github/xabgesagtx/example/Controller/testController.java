@@ -12,4 +12,10 @@ public class testController {
         model.addAttribute("name",name);
         return "index";
     }
+
+    @RequestMapping("download")
+    public  String success (Model model, @RequestParam(value ="name",required = false,defaultValue = "小哥") String name){
+        model.addAttribute("name",name);
+        return "download";
+    }
 }

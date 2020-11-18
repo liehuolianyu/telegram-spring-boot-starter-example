@@ -64,6 +64,7 @@ public class CloudSeeController {
     public MyResponse scanner(HttpServletRequest request){
         MyResponse myResponse= new MyResponse(200,true);
         String startName = request.getParameter("fileName");
+        logger.info("请求参数为："+startName);
         if (!StringUtils.isEmpty(startName)){
             String startHead = startName.substring(0,1);
             String[] tmp = startName.split(";");

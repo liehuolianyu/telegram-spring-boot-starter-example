@@ -1,18 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="../css/style.css" rel="stylesheet" type="text/css" media="all" />
 </head>
 <script src="../js/jquery.js"></script>
 <script src="../js/jquery-1.7.1.js"></script>
 
 
+<body>
+<!-- main -->
+<div class="main">
+    <h1>
+        批量扫描工具
+    </h1>
+    <form>
+        启始<input type="text" id="cloud" value="H1000000" onFocus="this.value = '';" onBlur="if (this.value == '') {this.value = 'H1000000';}"
+                 required="">
+        数量<input type="text" id="count" value="10000" onFocus="this.value = '';" onBlur="if (this.value == '') {this.value = '';}"
+                 required="">
+        <input type="submit" onclick="test()" value="提交">
+    </form>
+</div>
+<div class="footer">
+    <p>
+        &copy 更多功能请关注电报机器人：<a href="https://t.me/fulihao_bot" target="_blank">fulibot</a>
+    </p>
+</div>
+<!-- //main -->
+</body>
 
-<input type="text"  align="center" id="cloud" value="H1000000" />
+<!--<input type="text"  align="center" id="cloud" value="H1000000" />
 <br>
 <button type="button" onclick="test()">提交</button>
-</body>
+</body>-->
 
 <script>
 
@@ -22,6 +44,10 @@
 
         };*/
         var cloud = document.getElementById("cloud").value;
+        var count = document.getElementById("count").value;
+        if (count != ''){
+            cloud = cloud+";"+count;
+        }
         /*var data = JSON.stringify(adata);*/
         $.ajax({
             type : "GET",
@@ -34,7 +60,7 @@
                 console.log(data);
                 if (data.code === 200){
                     alert("成功");
-                    window.location.href = "success";
+/*                    window.location.href = "success";*/
                 }
             },
             error : function(e) {           //请求失败的回调函数

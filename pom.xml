@@ -43,24 +43,6 @@
 		<glassfish.version>2.29.1</glassfish.version>
 	</properties>
 
-	<profiles>
-		<profile>
-			<id>windows</id>
-			<properties>
-				<spring.profiles.active>windows</spring.profiles.active>
-			</properties>
-		</profile>
-		<profile>
-			<id>linux</id>
-			<activation>
-				<!--默认激活-->
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<spring.profiles.active>linux</spring.profiles.active>
-			</properties>
-		</profile>
-	</profiles>
 
 	<dependencies>
 		<dependency>
