@@ -7,7 +7,9 @@
 <script src="../js/jquery.js"></script>
 <script src="../js/jquery-1.7.1.js"></script>
 
-<input type="text"  id="cloud" value="H1000000" />
+
+
+<input type="text"  align="center" id="cloud" value="H1000000" />
 <br>
 <button type="button" onclick="test()">提交</button>
 </body>
@@ -28,8 +30,9 @@
            /* data : data, */                                //上传的参数
             async: true ,
             url : "cloudSee/scan?fileName="+cloud,     //请求的url。与后端@Request Mapping注解中的值一致。
-            success : function(data) {          //请求成功的回调函数
-                if (data.code === 0){
+            success : function(data) {//请求成功的回调函数
+                console.log(data);
+                if (data.code === 200){
                     alert("成功");
                     window.location.href = "success";
                 }
