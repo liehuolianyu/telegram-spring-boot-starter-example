@@ -1,9 +1,7 @@
 package com.github.xabgesagtx.example;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.github.xabgesagtx.example.Service.DealCloudSee;
-import org.jsoup.Connection;
+import com.github.xabgesagtx.example.Service.DealCloudSee2;
+import com.github.xabgesagtx.example.Service.DealGoLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +15,6 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.github.xabgesagtx.example.utils.*;
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 
@@ -33,20 +26,21 @@ public class ExampleBot extends TelegramLongPollingBot {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExampleBot.class);
 
-	@Value("${file.count}")
-	private  Integer ALL_Count;
 
-	@Value("${file.sleep}")
-	private Long SLEEP_TIME;
+	@Value("${bot.token}")
+	private String token;
+
+	@Value("${bot.username}")
+	private String username;
+
 
 	@Autowired
-	private  DealCloudSee dealCloudSee;
+	private  DealCloudSee2 dealCloudSee;
+
+	@Autowired
+	private DealGoLink goLink;
 
 
-
-	/*private static final String FILE_PATH = "/home/yangzi/software/cloudSee/";*/
-	@Value("${file.outputpath}")
-	private  String FILE_PATH ;
 
 	public  ExampleBot(){
 /*		DefaultBotOptions options = new DefaultBotOptions();
@@ -56,11 +50,7 @@ public class ExampleBot extends TelegramLongPollingBot {
 	 	super(new DefaultBotOptions());
 	 }
 	
-	@Value("${bot.token}")
-	private String token;
-	
-	@Value("${bot.username}")
-	private String username;
+
 	
 	@Override
 	public String getBotToken() {
@@ -80,116 +70,21 @@ public class ExampleBot extends TelegramLongPollingBot {
 			Long chatId = message.getChatId();
 			response.setChatId(chatId);
 			String text = message.getText();
-			if("stop".equals(message.getText())){
-
-				StringBuilder sql = new StringBuilder();
-				Connection.Response resp = null;
-				String POST_URL = "https://api.golinkapi.com/connect/stop-counting";
-				Map<String, String> headers = new HashMap<>();
-				Map<String, String> param = new HashMap<>();
-				headers.put("Host", "api.golinkapi.com");
-				headers.put("Accept", "*/*");
-				headers.put("cache-control", "no-cache");
-				headers.put("Content-Type", "application/x-www-form-urlencoded");
-				headers.put("format", "JSON_ESCAPED_UNICODE");
-				headers.put("Content-Length", "711");
-				param.put("token", "422623247B7652627E5544437F674553264E275F525A407644597E4046764361466E756E46653F3B2070525D783B5F5E5172572D2C572772677A755C56555570435E78263B7E762C58767D7C26577F51575544452C537120665C7B6125597D2279404D75785C5E646C72232046504452787C765E627A206D5F7C206E77774563405572466D502252505E20626E527B7866646E457E7B256D2C3B472C4C4C4C4525226E6C5D22654D637747274057555C77795B53504D7E4E4C7C702260452D60266D454653526D42236D653F70406678764173607E44407D7D4E2C61507F476E7821655E27526C2D204C664277784E6243585C2C7A4D7653786C756E505B21224C277B75503B515C7A24265745777D5027707A66467A26732929");
-				param.put("mask", "27242727727775772D7276272C232770232125227276712D2220752571257672");
-				param.put("version", "253A243A213A26");
-				param.put("platform", "20");
-				param.put("ip", "202D3A2525273A25252D3A2521203434");
-				try {
-					resp = httpsPost.post(headers, POST_URL, param);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				if ("200".equals(String.valueOf(resp.statusCode()))) {
-					System.out.println(resp.body());
-					System.out.println(URLDecoder.decode(resp.body()));
-					System.out.println(" 返回状态" + JSONObject.parseObject(resp.body()).getString("code"));
-					sql.append("返回码：").append(JSONObject.parseObject(resp.body()).getString("code") + "\n");
-					if (JSON.parseObject(resp.body()).getString("data") != null){
-						System.out.println(" 返回数据" + JSONObject.parseObject(resp.body()).getString("data").toString());
-						sql.append("返回数据：").append(JSONObject.parseObject(resp.body()).getString("data").toString());
-					}
-					else {
-						System.out.println(" 返回数据为空");
-						sql.append("返回数据为空");
-					}
-					response.setText(sql.toString());
-				} else {
-					sql.append("操作失败，请查看日志");
-					response.setText(sql.toString());
-				}
+			//停止加速器
+			if("/stop".equals(message.getText())){
+				response.setText(goLink.stopSpeedState());
 			}
+			//扫描
 			else  if (text.startsWith("H")){
-				ReentrantLock lock = new ReentrantLock();
-				String startHead = text.substring(0,1);
-				String[] tmp = text.split(";");
-				Integer allCount = 0;
-				Integer startNum = 0;
-				if (tmp.length==2){
-					allCount = Integer.valueOf(tmp[1]);
-					startNum = Integer.valueOf(tmp[0].trim().substring(1));
-				}else {
-					allCount = ALL_Count;
-					startNum = Integer.valueOf(text.trim().substring(1));
-				}
-				Integer endNUm = startNum+allCount;
-				/*String url = "http://bbs.cloudsee.com/service/yst-online?cloudNum=";
-				Connection.Response resp = null;*/
-				List<String> result = new CopyOnWriteArrayList<>();
-				long startTime=System.currentTimeMillis();
-				for (;startNum<=endNUm;startNum++){
-					try {
-						dealCloudSee.execute(result,startHead+startNum);
-						Thread.sleep(SLEEP_TIME);
-					} catch (InterruptedException e) {
-						try {
-							Thread.sleep(20);
-						} catch (InterruptedException ex) {
-							ex.printStackTrace();
-						}
-						logger.info(e.getMessage());
-					}
-					lock.lock();
-					if (result.size()>=10){
-							logger.info("已扫描超过10个，先写入文件，最后扫描值为："+startNum);
-							FileUtils.FileWriteListforTure(FILE_PATH+startHead+endNUm+".txt",result);
-					}
-					lock.unlock();
-				/*	resp = httpsPost.get(url+startHead+startNum);
-					if ("200".equals(String.valueOf(resp.statusCode()))){
-						logger.info(startHead+startNum+"："+resp.body());
-						//logger.info(JSONObject.parseObject(resp.body()).getString("onln"));
-						if(!StringUtils.isEmpty(JSONObject.parseObject(resp.body()).getString("onln"))){
-						if (JSONObject.parseObject(resp.body()).getString("onln").equals("1")){
-							result.add(startHead+startNum);
-						}
-						}
-					}*/
-					/*if (result.size()>10){
-						logger.info("已扫描超过10个，先写入文件，最后扫描值为："+startNum);
-						fileUtils.FileWriteListforTure(FILE_PATH+startHead+endNUm+".txt",result);
-						result.clear();
-					}*/
-				}
-				long endtime=System.currentTimeMillis();
-				logger.info(("程序运行时间： "+(endtime-startTime)+"ms"));
-				logger.info("已扫描完成，写入文件，最后扫描值为："+startNum);
-				FileUtils.FileWriteListforTure(FILE_PATH+startHead+endNUm+".txt",result);
-				result.clear();
-
-				response.setText("成功扫描并存入文件");
-
-
+				dealCloudSee.execute(text);
+				response.setText(OutputLine.line1);
 			}
 				else{
 				response.setText(text);
 			}
 			try {
 				execute(response);
-				logger.info("Sent message \"{}\" to {}", text, chatId);
+				logger.info("Sent message \"{}\" to {}", response.getText(), chatId);
 			} catch (TelegramApiException e) {
 				logger.error("Failed to send message \"{}\" to {} due to error: {}", text, chatId, e.getMessage());
 			}

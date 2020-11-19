@@ -1,7 +1,6 @@
 package com.github.xabgesagtx.example.Service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.xabgesagtx.example.Thread.TestThread;
 import com.github.xabgesagtx.example.utils.httpsPost;
 import org.jsoup.Connection;
 import org.slf4j.Logger;
@@ -25,21 +24,20 @@ public class DealCloudSee {
         Connection.Response response = null;
         try {
             response = httpsPost.get(URL+val);
-        } catch (IOException e) {
-            logger.info("报错了："+e.getMessage());
-        }
-        if ("200".equals(String.valueOf(response.statusCode()))) {
-            logger.info(Thread.currentThread().getName() + "：" + val + " :" + response.body());
-            //logger.info(JSONObject.parseObject(resp.body()).getString("onln"));
-            if (!StringUtils.isEmpty(response.body())) {
-                if (!StringUtils.isEmpty(JSONObject.parseObject(response.body()).getString("onln"))) {
-                    if (JSONObject.parseObject(response.body()).getString("onln").equals("1")) {
-                        list.add(val);
+            if ("200".equals(String.valueOf(response.statusCode()))) {
+                logger.info(Thread.currentThread().getName() + "：" + val + " :" + response.body());
+                //logger.info(JSONObject.parseObject(resp.body()).getString("onln"));
+                if (!StringUtils.isEmpty(response.body())) {
+                    if (!StringUtils.isEmpty(JSONObject.parseObject(response.body()).getString("onln"))) {
+                        if (JSONObject.parseObject(response.body()).getString("onln").equals("1")) {
+                            list.add(val);
+                        }
                     }
                 }
             }
+        } catch (IOException e) {
+            logger.info("调用接口报错："+e.getMessage());
         }
-
     }
 
 }
