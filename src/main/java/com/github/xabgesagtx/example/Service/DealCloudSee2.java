@@ -44,12 +44,13 @@ public class DealCloudSee2 {
             startNum = Integer.valueOf(startName.trim().substring(1));
         }
         Integer endNUm = startNum+allCount;
-        List<String> result = new CopyOnWriteArrayList<>();
+
+/*        List<String> result = new CopyOnWriteArrayList<>();*/
 
 
         for (; startNum <= endNUm; startNum++) {
             try {
-                cloudSee.execute(result, startHead + startNum);
+                cloudSee.execute(FILE_PATH + startHead + endNUm + ".txt", startHead + startNum);
                 Thread.sleep(SLEEP_TIME);
             } catch (InterruptedException e) {
                 try {
@@ -59,16 +60,17 @@ public class DealCloudSee2 {
                 }
                 logger.info(e.getMessage());
             }
-            lock.lock();
+            //老方法放在list中，导致丢失部分数据
+/*            lock.lock();
             if (result.size() >= 2) {
                 logger.info("已扫描超过10个，先写入文件，最后扫描值为：" + startNum);
-                FileUtils.FileWriteListforTure(FILE_PATH + startHead + endNUm + ".txt", result);
+                FileUtils.FileWriteListforTure(, result);
             }
-            lock.unlock();
+            lock.unlock();*/
 
         }
         logger.info("已扫描完成，写入文件，最后扫描值为：" + startNum);
-        FileUtils.FileWriteListforTure(FILE_PATH + startHead + endNUm + ".txt", result);
+       /* FileUtils.FileWriteListforTure(FILE_PATH + startHead + endNUm + ".txt", result);*/
 
     }
 }

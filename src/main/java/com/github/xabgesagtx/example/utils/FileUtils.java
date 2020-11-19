@@ -18,6 +18,7 @@ public class FileUtils {
         try {
             writer = new FileWriter(path,isoverride);// 字符流
             writer.write(data);
+            writer.write("\r\n");
 
         } catch (IOException e) {
             // TODO Auto-generated catch block

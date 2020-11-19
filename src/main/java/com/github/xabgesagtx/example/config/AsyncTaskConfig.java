@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 @EnableAsync
@@ -35,6 +36,7 @@ public class AsyncTaskConfig implements AsyncConfigurer {
         threadPool.setAwaitTerminationSeconds(0);
         //  线程名称前缀
         threadPool.setThreadNamePrefix("Telegram-Async-");
+        threadPool.setRejectedExecutionHandler( new ThreadPoolExecutor.CallerRunsPolicy());
         // 初始化线程
         threadPool.initialize();
         return threadPool;
