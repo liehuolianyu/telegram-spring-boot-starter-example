@@ -21,3 +21,11 @@ server:
 spring:
   thymeleaf:
     cache: false
+
+mythread:
+  #核心线程数量
+  corepoolsize: 10
+  #最大线程数量
+  maxpoolsize: 128
+  #队列长度
+  queuecapacity: 99999

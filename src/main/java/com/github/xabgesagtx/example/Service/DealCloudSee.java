@@ -21,8 +21,6 @@ public class DealCloudSee {
 
     private static  final  String URL = "http://bbs.cloudsee.com/service/yst-online?cloudNum=";
 
-    @Value("${file.outputpath}")
-    private  String FILE_PATH ;
 
     @Async
     public void execute(String path,String val){

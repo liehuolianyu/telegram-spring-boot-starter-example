@@ -17,3 +17,11 @@ server:
   port: 8081
   #项目名，如果不设定，默认是 /
   #context-path: /demo
+
+mythread:
+  #核心线程数量
+  corepoolsize: 10
+  #最大线程数量
+  maxpoolsize: 128
+  #队列长度
+  queuecapacity: 99999
