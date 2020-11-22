@@ -14,13 +14,23 @@ file:
 
 server:
   #端口号
-  port: 8081
+  port: 8082
   #项目名，如果不设定，默认是 /
   #context-path: /demo
 
 spring:
   thymeleaf:
     cache: false
+  datasource:
+    url: jdbc:mysql://localhost:3306/telegram?serverTimezone=UTC
+    username: root
+    password: 19971229
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml  #对应mapper映射xml文件所在路径
+  map-underscore-to-camel-case: true
+  type-aliases-package: com.github.xabgesagtx.example.entity  #对应实体类路径
 
 mythread:
   #核心线程数量
