@@ -1,9 +1,11 @@
 package com.github.xabgesagtx.example;
 
+import com.github.xabgesagtx.example.Service.DealCloudSee2;
 import com.github.xabgesagtx.example.Service.DealPhotoMessage;
 import com.github.xabgesagtx.example.Service.DealTextMessage;
 import com.github.xabgesagtx.example.Service.DealVideoMessage;
 import com.github.xabgesagtx.example.Service.impl.UserServiceimpl;
+import com.github.xabgesagtx.example.utils.OutputLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,10 @@ public class ExampleBot extends TelegramLongPollingBot {
 	@Autowired
 	UserServiceimpl userServiceimpl;
 
+	@Autowired
+	DealCloudSee2 cloudSee2;
+
+
 	public  ExampleBot(){
 /*		DefaultBotOptions options = new DefaultBotOptions();
 		options.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
@@ -75,14 +81,23 @@ public class ExampleBot extends TelegramLongPollingBot {
 	@Override
 	public void onUpdateReceived(Update update) {
 		if (update.hasMessage()) {
+			Message message = update.getMessage();
 			//若不存在用户表则插入
-			if (!userServiceimpl.isExists(update.getMessage().getFrom().getId())) {
-				userServiceimpl.insert(update.getMessage());
+			if (!userServiceimpl.isExists(message.getFrom().getId())) {
+				userServiceimpl.insert(message);
 			}
-			if (userServiceimpl.isAdmin(update.getMessage().getFrom().getId())) {
-
+			//
+			if (userServiceimpl.isAdmin(message.getFrom().getId())) {
+				if (message.hasText()) {
+					if (message.getText().startsWith(OutputLine.scan)){
+						try {
+							execute(cloudSee2.dealMessage(message.getText()));
+						} catch (TelegramApiException e) {
+							logger.error("扫描处理失败，原因为："+e.toString());
+						}
+					}
+				}
 			} else {
-				Message message = update.getMessage();
 				//处理文字消息
 				if (message.hasText()) {
 					//只处理“/”开头的数据
@@ -90,7 +105,7 @@ public class ExampleBot extends TelegramLongPollingBot {
 						try {
 							execute(textMessage.deal(message));
 						} catch (TelegramApiException e) {
-							logger.info("回复文本失败，具体原因：" + e.toString());
+							logger.error("回复文本失败，具体原因：" + e.toString());
 						}
 					}
 				}
@@ -98,18 +113,17 @@ public class ExampleBot extends TelegramLongPollingBot {
 					try {
 						execute(photoMessage.deal(message));
 					} catch (TelegramApiException e) {
-						logger.info("回复图片失败，具体原因：" + e.toString());
+						logger.error("回复图片失败，具体原因：" + e.toString());
 					}
 				}
 				if (message.hasEntities()) {
-
 
 				}
 				if (message.hasVideo()) {
 					try {
 						execute(videoMessage.deal(message));
 					} catch (TelegramApiException e) {
-						logger.info("回复视频失败，具体原因：" + e.toString());
+						logger.error("回复视频失败，具体原因：" + e.toString());
 					}
 				}
 

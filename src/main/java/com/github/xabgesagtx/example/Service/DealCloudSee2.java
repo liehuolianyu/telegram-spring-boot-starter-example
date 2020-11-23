@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -72,5 +74,11 @@ public class DealCloudSee2 {
         logger.info("已扫描完成，写入文件，最后扫描值为：" + startNum);
        /* FileUtils.FileWriteListforTure(FILE_PATH + startHead + endNUm + ".txt", result);*/
 
+    }
+
+    public SendMessage dealMessage(String message){
+        SendMessage sendMessage = new SendMessage();
+
+        return sendMessage;
     }
 }
