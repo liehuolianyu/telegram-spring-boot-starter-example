@@ -23,6 +23,7 @@ public class UserServiceimpl implements UserService {
         user.setIsbot(message.getFrom().getBot());
         user.setLastname(message.getFrom().getLastName());
         user.setUsername(message.getFrom().getUserName());
+        user.setIsAdmin(0);
         return userMapper.insert(user);
     }
 

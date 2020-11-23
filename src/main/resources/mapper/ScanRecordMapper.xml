@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.xabgesagtx.example.dao.ScanRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.github.xabgesagtx.example.entity.ScanRecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="start_num" property="startNum" jdbcType="INTEGER" />
+    <result column="end_num" property="endNum" jdbcType="INTEGER" />
+    <result column="is_finish" property="isFinish" jdbcType="INTEGER" />
+    <result column="scan_date" property="scanDate" jdbcType="TIMESTAMP" />
+    <result column="scan_finish_date" property="scanFinishDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, start_num, end_num, is_finish, scan_date, scan_finish_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from scan_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from scan_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.github.xabgesagtx.example.entity.ScanRecord" >
+    insert into scan_record ( user_id, start_num,
+      end_num, is_finish,scan_date)
+    values ( #{userId,jdbcType=INTEGER}, #{startNum,jdbcType=VARCHAR},
+      #{endNum,jdbcType=VARCHAR}, #{isFinish,jdbcType=INTEGER},#{scanDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.github.xabgesagtx.example.entity.ScanRecord" >
+    insert into scan_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="startNum != null" >
+        start_num,
+      </if>
+      <if test="endNum != null" >
+        end_num,
+      </if>
+      <if test="isFinish != null" >
+        is_finish,
+      </if>
+      <if test="scanDate != null" >
+        scan_date,
+      </if>
+      <if test="scanFinishDate != null" >
+        scan_finish_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="startNum != null" >
+        #{startNum,jdbcType=INTEGER},
+      </if>
+      <if test="endNum != null" >
+        #{endNum,jdbcType=INTEGER},
+      </if>
+      <if test="isFinish != null" >
+        #{isFinish,jdbcType=INTEGER},
+      </if>
+      <if test="scanDate != null" >
+        #{scanDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="scanFinishDate != null" >
+        #{scanFinishDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.github.xabgesagtx.example.entity.ScanRecord" >
+    update scan_record
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="startNum != null" >
+        start_num = #{startNum,jdbcType=INTEGER},
+      </if>
+      <if test="endNum != null" >
+        end_num = #{endNum,jdbcType=INTEGER},
+      </if>
+      <if test="isFinish != null" >
+        is_finish = #{isFinish,jdbcType=INTEGER},
+      </if>
+      <if test="scanDate != null" >
+        scan_date = #{scanDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="scanFinishDate != null" >
+        scan_finish_date = #{scanFinishDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.github.xabgesagtx.example.entity.ScanRecord" >
+    update scan_record
+    set user_id = #{userId,jdbcType=INTEGER},
+      start_num = #{startNum,jdbcType=INTEGER},
+      end_num = #{endNum,jdbcType=INTEGER},
+      is_finish = #{isFinish,jdbcType=INTEGER},
+      scan_date = #{scanDate,jdbcType=TIMESTAMP},
+      scan_finish_date = #{scanFinishDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectCountByUserId" parameterType="java.lang.Integer" resultType="integer">
+    select count(1)
+    from scan_record
+    where user_id = #{userId,jdbcType=INTEGER}
+    and is_finish = 0
+  </select>
+
+  <update id="updateByUserId" parameterType="com.github.xabgesagtx.example.entity.ScanRecord" >
+    update scan_record
+    set
+      is_finish = #{isFinish,jdbcType=INTEGER},
+      scan_finish_date = #{scanFinishDate,jdbcType=TIMESTAMP}
+    where user_id = #{userId,jdbcType=INTEGER}
+    and is_finish = 0
+  </update>
+
+
+</mapper>

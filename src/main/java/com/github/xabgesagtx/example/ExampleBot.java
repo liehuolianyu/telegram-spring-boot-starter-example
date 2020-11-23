@@ -4,7 +4,9 @@ import com.github.xabgesagtx.example.Service.DealCloudSee2;
 import com.github.xabgesagtx.example.Service.DealPhotoMessage;
 import com.github.xabgesagtx.example.Service.DealTextMessage;
 import com.github.xabgesagtx.example.Service.DealVideoMessage;
+import com.github.xabgesagtx.example.Service.impl.ScanRecordServiceImpl;
 import com.github.xabgesagtx.example.Service.impl.UserServiceimpl;
+import com.github.xabgesagtx.example.entity.ScanRecord;
 import com.github.xabgesagtx.example.utils.OutputLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +59,7 @@ public class ExampleBot extends TelegramLongPollingBot {
 	DealCloudSee2 cloudSee2;
 
 
+
 	public  ExampleBot(){
 /*		DefaultBotOptions options = new DefaultBotOptions();
 		options.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
@@ -86,18 +89,23 @@ public class ExampleBot extends TelegramLongPollingBot {
 			if (!userServiceimpl.isExists(message.getFrom().getId())) {
 				userServiceimpl.insert(message);
 			}
-			//
+
+			//管理员操作功能
 			if (userServiceimpl.isAdmin(message.getFrom().getId())) {
 				if (message.hasText()) {
 					if (message.getText().startsWith(OutputLine.scan)){
 						try {
-							execute(cloudSee2.dealMessage(message.getText()));
+							execute(cloudSee2.dealMessage(message));
 						} catch (TelegramApiException e) {
 							logger.error("扫描处理失败，原因为："+e.toString());
 						}
 					}
 				}
-			} else {
+			}
+
+			//
+
+			else {
 				//处理文字消息
 				if (message.hasText()) {
 					//只处理“/”开头的数据

@@ -1,6 +1,8 @@
 package com.github.xabgesagtx.example.Service;
 
+import com.github.xabgesagtx.example.Service.impl.ScanRecordServiceImpl;
 import com.github.xabgesagtx.example.utils.FileUtils;
+import com.github.xabgesagtx.example.utils.OutputLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,12 @@ public class DealCloudSee2 {
 
     @Autowired
     private DealCloudSee cloudSee;
+
+    @Autowired
+    ScanRecordServiceImpl scanRecordService ;
+
+    @Autowired
+    cloudSeeScan cloudSeeScan;
 
     @Value("${file.count}")
     private  Integer ALL_Count;
@@ -76,9 +84,29 @@ public class DealCloudSee2 {
 
     }
 
-    public SendMessage dealMessage(String message){
-        SendMessage sendMessage = new SendMessage();
 
+    public SendMessage dealMessage(Message message) {
+        SendMessage sendMessage = new SendMessage();
+        if (scanRecordService.hasRecord(message.getFrom().getId())) {
+            sendMessage.setChatId(message.getChatId()).setText(OutputLine.line4);
+        } else {
+            String startName = message.getText().substring(5);
+            String startHead = startName.substring(0, 1);
+            String[] tmp = startName.split(";");
+            Integer allCount = 0;
+            Integer startNum = 0;
+            if (tmp.length == 2) {
+                allCount = Integer.valueOf(tmp[1]);
+                startNum = Integer.valueOf(tmp[0].trim().substring(1));
+            } else {
+                allCount = ALL_Count;
+                startNum = Integer.valueOf(startName.trim().substring(1));
+            }
+            Integer endNUm = startNum + allCount;
+            cloudSeeScan.doScan(startNum,endNUm,FILE_PATH,startHead,SLEEP_TIME,message.getFrom().getId());
+            scanRecordService.insert(startNum,endNUm,message.getFrom().getId());
+            sendMessage.setChatId(message.getChatId()).setText(OutputLine.line5);
+        }
         return sendMessage;
     }
 }
