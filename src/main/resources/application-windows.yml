@@ -22,9 +22,9 @@ spring:
   thymeleaf:
     cache: false
   datasource:
-    url: jdbc:mysql://localhost:3306/telegram?serverTimezone=UTC
-    username: root
-    password: 19971229
+    url: jdbc:mysql://test.yangge666.top:3306/telegram?serverTimezone=UTC
+    username: telegram
+    password: telegram
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis:

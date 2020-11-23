@@ -2,10 +2,16 @@ package com.github.xabgesagtx.example.entity;
 
 public class User {
     private Integer id;
-    private String firstName;
-    private String lastName;
-    private Boolean isBot;
-    private String userName;
+
+    private String firstname;
+
+    private String lastname;
+
+    private Boolean isbot;
+
+    private String username;
+
+    private Integer isAdmin;
 
     public Integer getId() {
         return id;
@@ -15,35 +21,43 @@ public class User {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname == null ? null : firstname.trim();
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLastname(String lastname) {
+        this.lastname = lastname == null ? null : lastname.trim();
     }
 
-    public Boolean getIsBot() {
-        return isBot;
+    public Boolean getIsbot() {
+        return isbot;
     }
 
-    public void setIsBot(Boolean isBot) {
-        this.isBot = isBot;
+    public void setIsbot(Boolean isbot) {
+        this.isbot = isbot;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username == null ? null : username.trim();
+    }
+
+    public Integer getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Integer isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

@@ -75,38 +75,45 @@ public class ExampleBot extends TelegramLongPollingBot {
 	@Override
 	public void onUpdateReceived(Update update) {
 		if (update.hasMessage()) {
-			userServiceimpl.insert(update.getMessage());
-			Message message = update.getMessage();
-			//处理文字消息
-			if (message.hasText()){
-				//只处理“/”开头的数据
-				if (message.getText().startsWith("/")){
-					try {
-						execute(textMessage.deal(message));
-					} catch (TelegramApiException e) {
-						logger.info("回复文本失败，具体原因："+e.toString());
+			//若不存在用户表则插入
+			if (!userServiceimpl.isExists(update.getMessage().getFrom().getId())) {
+				userServiceimpl.insert(update.getMessage());
+			}
+			if (userServiceimpl.isAdmin(update.getMessage().getFrom().getId())) {
+
+			} else {
+				Message message = update.getMessage();
+				//处理文字消息
+				if (message.hasText()) {
+					//只处理“/”开头的数据
+					if (message.getText().startsWith("/")) {
+						try {
+							execute(textMessage.deal(message));
+						} catch (TelegramApiException e) {
+							logger.info("回复文本失败，具体原因：" + e.toString());
+						}
 					}
 				}
-			}
-			if (message.hasPhoto()){
-				try {
-					execute(photoMessage.deal(message));
-				} catch (TelegramApiException e) {
-					logger.info("回复图片失败，具体原因："+e.toString());
+				if (message.hasPhoto()) {
+					try {
+						execute(photoMessage.deal(message));
+					} catch (TelegramApiException e) {
+						logger.info("回复图片失败，具体原因：" + e.toString());
+					}
 				}
-			}
-			if (message.hasEntities()){
+				if (message.hasEntities()) {
 
 
-			}
-			if(message.hasVideo()){
-				try {
-					execute(videoMessage.deal(message));
-				} catch (TelegramApiException e) {
-					logger.info("回复视频失败，具体原因："+e.toString());
 				}
-			}
+				if (message.hasVideo()) {
+					try {
+						execute(videoMessage.deal(message));
+					} catch (TelegramApiException e) {
+						logger.info("回复视频失败，具体原因：" + e.toString());
+					}
+				}
 
+			}
 		}
 	}
 
