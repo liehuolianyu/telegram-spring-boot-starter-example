@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.xabgesagtx.example.dao.ChatListMapper" >
   <resultMap id="BaseResultMap" type="com.github.xabgesagtx.example.entity.ChatList" >
-    <id column="id" property="id" jdbcType="INTEGER" />
+    <id column="id" property="id" jdbcType="VARCHAR" />
     <result column="type" property="type" jdbcType="VARCHAR" />
     <result column="title" property="title" jdbcType="VARCHAR" />
     <result column="username" property="username" jdbcType="VARCHAR" />
@@ -10,20 +10,20 @@
   <sql id="Base_Column_List" >
     id, type, title, username
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from chat_list
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from chat_list
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.github.xabgesagtx.example.entity.ChatList" >
     insert into chat_list (id, type, title, 
       username)
-    values (#{id,jdbcType=INTEGER}, #{type,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
       #{username,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.github.xabgesagtx.example.entity.ChatList" >
@@ -44,7 +44,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
-        #{id,jdbcType=INTEGER},
+        #{id,jdbcType=VARCHAR},
       </if>
       <if test="type != null" >
         #{type,jdbcType=VARCHAR},
@@ -70,13 +70,19 @@
         username = #{username,jdbcType=VARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.github.xabgesagtx.example.entity.ChatList" >
     update chat_list
     set type = #{type,jdbcType=VARCHAR},
       title = #{title,jdbcType=VARCHAR},
       username = #{username,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </update>
+
+  <select id="selectall" resultType="com.github.xabgesagtx.example.entity.ChatList" >
+    select
+    <include refid="Base_Column_List" />
+    from chat_list
+  </select>
 </mapper>

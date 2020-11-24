@@ -107,19 +107,11 @@ public class ExampleBot extends TelegramLongPollingBot {
 					}
 				}
 				if (message.hasVideo()){
-					SendVideo sendVideo = new SendVideo();
-					VideoList videoList = new VideoList();
-					videoList.setFileId(message.getVideo().getFileId());
-					videoList.setFileSize(message.getVideo().getFileSize());
-					videoList.setFileType(message.getVideo().getMimeType());
-					videoList.setFileDesc(message.getCaption());
-					videoListService.insert(videoList);
-					System.out.println(message.getChatId());;
-					sendVideo.setChatId("-1001387318488");
-					sendVideo.setVideo(new InputFile(message.getVideo().getFileId()));
-					sendVideo.setCaption(message.getCaption());
 					try {
-						execute(sendVideo);
+						List<SendVideo> sendVideos = videoMessage.deal2(message);
+						for (SendVideo sendVideo : sendVideos){
+							execute(sendVideo);
+						}
 					} catch (TelegramApiException e) {
 						e.printStackTrace();
 					}
