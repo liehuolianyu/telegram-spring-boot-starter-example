@@ -6,7 +6,9 @@ import com.github.xabgesagtx.example.Service.DealTextMessage;
 import com.github.xabgesagtx.example.Service.DealVideoMessage;
 import com.github.xabgesagtx.example.Service.impl.ScanRecordServiceImpl;
 import com.github.xabgesagtx.example.Service.impl.UserServiceimpl;
+import com.github.xabgesagtx.example.Service.impl.VideoListServiceImpl;
 import com.github.xabgesagtx.example.entity.ScanRecord;
+import com.github.xabgesagtx.example.entity.VideoList;
 import com.github.xabgesagtx.example.utils.OutputLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +60,9 @@ public class ExampleBot extends TelegramLongPollingBot {
 	@Autowired
 	DealCloudSee2 cloudSee2;
 
+	@Autowired
+	VideoListServiceImpl videoListService;
+
 
 
 	public  ExampleBot(){
@@ -99,6 +104,24 @@ public class ExampleBot extends TelegramLongPollingBot {
 						} catch (TelegramApiException e) {
 							logger.error("扫描处理失败，原因为："+e.toString());
 						}
+					}
+				}
+				if (message.hasVideo()){
+					SendVideo sendVideo = new SendVideo();
+					VideoList videoList = new VideoList();
+					videoList.setFileId(message.getVideo().getFileId());
+					videoList.setFileSize(message.getVideo().getFileSize());
+					videoList.setFileType(message.getVideo().getMimeType());
+					videoList.setFileDesc(message.getCaption());
+					videoListService.insert(videoList);
+					System.out.println(message.getChatId());;
+					sendVideo.setChatId("-1001387318488");
+					sendVideo.setVideo(new InputFile(message.getVideo().getFileId()));
+					sendVideo.setCaption(message.getCaption());
+					try {
+						execute(sendVideo);
+					} catch (TelegramApiException e) {
+						e.printStackTrace();
 					}
 				}
 			}
