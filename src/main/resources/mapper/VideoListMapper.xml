@@ -44,4 +44,9 @@
       </if>
     </trim>
   </insert>
+  <select id="selectCountByfileId" parameterType="Integer" resultType="Integer">
+    select count(1)
+    from video_list
+    where file_size = #{fileSize,jdbcType=INTEGER}
+  </select>
 </mapper>

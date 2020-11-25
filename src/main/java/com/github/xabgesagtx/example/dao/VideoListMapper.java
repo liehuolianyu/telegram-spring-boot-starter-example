@@ -6,4 +6,6 @@ public interface VideoListMapper {
     int insert(VideoList record);
 
     int insertSelective(VideoList record);
+
+    Integer selectCountByfileId(Integer fileSize);
 }

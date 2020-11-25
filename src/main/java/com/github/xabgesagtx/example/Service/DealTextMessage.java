@@ -21,7 +21,7 @@ public class DealTextMessage {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId());
         //停止加速器
-        if("/stop".equals(message.getText())){
+/*        if("/stop".equals(message.getText())){
             sendMessage.setText(goLink.stopSpeedState());
         }
         //扫描
@@ -29,9 +29,8 @@ public class DealTextMessage {
             dealCloudSee.execute(message.getText());
             sendMessage.setText(OutputLine.line1);
         }
-        else{
+        else{*/
             sendMessage.setText(message.getText());
-        }
         return sendMessage;
     }
 

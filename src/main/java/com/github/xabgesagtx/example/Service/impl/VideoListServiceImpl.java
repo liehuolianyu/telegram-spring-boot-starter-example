@@ -15,4 +15,14 @@ public class VideoListServiceImpl {
    public int insert(VideoList videoList){
         return videoListMapper.insert(videoList);
     }
+
+
+    public boolean isExists(Integer fileSize){
+       boolean flag = false;
+       if (videoListMapper.selectCountByfileId(fileSize)>0){
+           flag = true;
+       }
+       return flag;
+    }
+
 }

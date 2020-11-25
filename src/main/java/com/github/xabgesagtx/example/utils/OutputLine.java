@@ -19,4 +19,17 @@ public class OutputLine {
      * 命令相关
      */
     public static final String scan = "/scan"; //扫描cloudsee
+
+
+    /**
+     * 关键词
+     */
+    public static final String blackline1 = "邀请";
+    public static final String blackline2 = "加群";
+
+    public static final String blackline3 = "邀请";
+
+    public static final String blackline4 = "邀请";
+    public static final String blackline5 = "邀请";
+
 }

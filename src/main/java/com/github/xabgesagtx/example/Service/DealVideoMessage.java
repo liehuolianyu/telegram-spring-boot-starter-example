@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,14 +37,16 @@ public class DealVideoMessage {
      * @return
      */
     public List<SendVideo> deal2(Message message){
-        List<SendVideo> sendVideos = null;
+        List<SendVideo> sendVideos = new ArrayList<>();
         List<ChatList> chatLists =  chatListService.selectAll();
         VideoList videoList = new VideoList();
-        videoList.setFileId(message.getVideo().getFileId());
-        videoList.setFileSize(message.getVideo().getFileSize());
-        videoList.setFileType(message.getVideo().getMimeType());
-        videoList.setFileDesc(message.getCaption());
-        videoListService.insert(videoList);
+        if (!videoListService.isExists(message.getVideo().getFileSize())){
+            videoList.setFileId(message.getVideo().getFileId());
+            videoList.setFileSize(message.getVideo().getFileSize());
+            videoList.setFileType(message.getVideo().getMimeType());
+            videoList.setFileDesc(message.getCaption());
+            videoListService.insert(videoList);
+        }
         for (ChatList chatList : chatLists){
             SendVideo sendVideo = new SendVideo();
             sendVideo.setChatId(chatList.getId());
