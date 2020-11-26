@@ -20,6 +20,8 @@ public class OutputLine {
      */
     public static final String scan = "/scan"; //扫描cloudsee
 
+    public static final String getchat = "/getchat";
+
 
     /**
      * 关键词

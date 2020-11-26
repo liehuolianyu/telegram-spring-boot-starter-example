@@ -20,6 +20,10 @@ public class DealTextMessage {
     public SendMessage deal(Message message){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId());
+        if (message.getText().equals(OutputLine.getchat)){
+            sendMessage.setText("https://t.me/joinchat/Guv0lEednyPhC9m1BTGeeQ");
+        }
+        else {
         //停止加速器
 /*        if("/stop".equals(message.getText())){
             sendMessage.setText(goLink.stopSpeedState());
@@ -31,6 +35,7 @@ public class DealTextMessage {
         }
         else{*/
             sendMessage.setText(message.getText());
+        }
         return sendMessage;
     }
 
