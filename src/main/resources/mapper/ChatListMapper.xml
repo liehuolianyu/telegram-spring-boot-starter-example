@@ -11,7 +11,7 @@
     id, type, title, username
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from chat_list
     where id = #{id,jdbcType=VARCHAR}
@@ -21,9 +21,9 @@
     where id = #{id,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.github.xabgesagtx.example.entity.ChatList" >
-    insert into chat_list (id, type, title, 
+    insert into chat_list (id, type, title,
       username)
-    values (#{id,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR},
       #{username,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.github.xabgesagtx.example.entity.ChatList" >

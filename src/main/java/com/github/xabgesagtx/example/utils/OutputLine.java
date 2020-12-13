@@ -15,6 +15,8 @@ public class OutputLine {
 
     public static final String line4 = "温馨提示，请在上一次提交的扫描完成后再操作！！！";
     public static final String line5 = "已成功开始扫描！！！";
+    public static final String line6 = "输入格式不正确，请在/scan后加上相关参数！！！";
+    public static final String line7 = "参数数量不正确，请检查！！！";
     /**
      * 命令相关
      */

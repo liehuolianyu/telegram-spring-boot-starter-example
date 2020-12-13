@@ -80,4 +80,13 @@
     where chat_id =  #{chatId,jdbcType=VARCHAR}
     and user_id = #{userId,jdbcType=INTEGER}
   </update>
+  <select id="selectAll" resultType="com.github.xabgesagtx.example.entity.GroupMember">
+    select chat_id as chatId,
+    user_id as userId,
+    black_keyword as blackKeyword,
+    state as state,
+    photo_count as photoCount,
+    video_count as videoCount
+    from group_member
+  </select>
 </mapper>

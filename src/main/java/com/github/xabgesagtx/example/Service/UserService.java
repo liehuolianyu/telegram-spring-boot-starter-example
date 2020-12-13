@@ -3,6 +3,8 @@ package com.github.xabgesagtx.example.Service;
 import com.github.xabgesagtx.example.entity.User;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+import java.util.List;
+
 public interface UserService {
 
     /**
@@ -27,5 +29,8 @@ public interface UserService {
      * @return
      */
     boolean isExists(Integer id);
+
+
+    public List<User> selectAll();
 
 }

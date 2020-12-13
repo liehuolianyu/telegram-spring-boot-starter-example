@@ -103,4 +103,10 @@
       is_admin = #{isAdmin,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectAll" resultType="com.github.xabgesagtx.example.entity.User">
+    select
+     id, firstName, lastName, isBot, userName, is_admin as isAdmin
+    from user
+  </select>
 </mapper>

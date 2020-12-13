@@ -4,18 +4,22 @@ import com.github.xabgesagtx.example.Service.DealCloudSee2;
 import com.github.xabgesagtx.example.Service.DealPhotoMessage;
 import com.github.xabgesagtx.example.Service.DealTextMessage;
 import com.github.xabgesagtx.example.Service.DealVideoMessage;
+import com.github.xabgesagtx.example.Service.impl.ChatListServiceImpl;
 import com.github.xabgesagtx.example.Service.impl.GroupMemberServiceImpl;
 import com.github.xabgesagtx.example.Service.impl.UserServiceimpl;
 import com.github.xabgesagtx.example.Service.impl.VideoListServiceImpl;
+import com.github.xabgesagtx.example.entity.ChatList;
+import com.github.xabgesagtx.example.entity.VideoList;
 import com.github.xabgesagtx.example.utils.OutputLine;
+import com.github.xabgesagtx.example.utils.ScheduleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -28,7 +32,7 @@ import java.util.List;
  * This example bot is an echo bot that just repeats the messages sent to him
  */
 @Component
-public class ExampleBot extends TelegramLongPollingBot {
+public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ExampleBot.class);
 
@@ -51,6 +55,9 @@ public class ExampleBot extends TelegramLongPollingBot {
 
     @Autowired
     UserServiceimpl userServiceimpl;
+
+    @Autowired
+    ChatListServiceImpl chatListService;
 
     @Autowired
     DealCloudSee2 cloudSee2;
@@ -120,6 +127,8 @@ public class ExampleBot extends TelegramLongPollingBot {
                 }
             } else {
 
+
+
                 //管理员操作功能
                 if (userServiceimpl.isAdmin(message.getFrom().getId())) {
                     if (message.hasText()) {
@@ -143,12 +152,9 @@ public class ExampleBot extends TelegramLongPollingBot {
 
                     if (message.hasVideo()) {
                         try {
-                            List<SendVideo> sendVideos = videoMessage.deal2(message);
-                            for (SendVideo sendVideo : sendVideos) {
-                                execute(sendVideo);
-                            }
+                            execute(videoMessage.deal2(message));
                         } catch (TelegramApiException e) {
-                            e.printStackTrace();
+                            logger.info("资源入库报错了！！！"+e.toString());
                         }
                     }
                 }
@@ -196,5 +202,27 @@ public class ExampleBot extends TelegramLongPollingBot {
         logger.info("username: {}, token: {}", username, token);
     }
 
+    @Override
+    public void timerSendVideo() {
+        List<VideoList> videoLists = videoListService.selectNotSend(0);
+        if (!CollectionUtils.isEmpty(videoLists)) {
+            SendVideo sendVideo = new SendVideo();
+            List<ChatList> chatLists = chatListService.selectAll();
+            if (!CollectionUtils.isEmpty(chatLists)) {
+                for (ChatList chatList : chatLists) {
+                    for (VideoList videoList : videoLists) {
+                        sendVideo.setChatId(chatList.getId()).setVideo(new InputFile(videoList.getFileId()))
+                                .setCaption(videoList.getFileDesc());
+                        try {
+                            execute(sendVideo);
+                            videoListService.updateIsSendByFileid(videoList.getFileId());
+                        } catch (TelegramApiException e) {
+                            logger.error("主动发送视频报错了：" + e.toString());
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }

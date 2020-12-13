@@ -9,6 +9,16 @@ public class VideoList {
 
     private String fileDesc;
 
+    private Integer isSend;
+
+    public Integer getIsSend() {
+        return isSend;
+    }
+
+    public void setIsSend(Integer isSend) {
+        this.isSend = isSend;
+    }
+
     public String getFileId() {
         return fileId;
     }

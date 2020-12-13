@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
@@ -40,18 +41,16 @@ public class DealCloudSee2 {
     private  String FILE_PATH ;
 
     @Async
-    public void execute(String startName ) {
+    public void execute(String startHead, String startName,String count ) {
         ReentrantLock lock = new ReentrantLock();
-        String startHead = startName.substring(0,1);
-        String[] tmp = startName.split(";");
         Integer allCount = 0;
-        Integer startNum = 0;
-        if (tmp.length==2){
-            allCount = Integer.valueOf(tmp[1]);
-            startNum = Integer.valueOf(tmp[0].trim().substring(1));
+        Integer startNum = Integer.valueOf(startName);
+        startNum = Integer.valueOf(startName);
+        if (!StringUtils.isEmpty(count)){
+            allCount = Integer.valueOf(count);
+
         }else {
             allCount = ALL_Count;
-            startNum = Integer.valueOf(startName.trim().substring(1));
         }
         Integer endNUm = startNum+allCount;
 
@@ -87,25 +86,44 @@ public class DealCloudSee2 {
 
     public SendMessage dealMessage(Message message) {
         SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(message.getChatId());
         if (scanRecordService.hasRecord(message.getFrom().getId())) {
             sendMessage.setChatId(message.getChatId()).setText(OutputLine.line4);
         } else {
             String startName = message.getText().substring(5);
-            String startHead = startName.substring(0, 1);
+           String[] str =  startName.trim().split("&");
+           if (str == null ){
+               sendMessage.setText(OutputLine.line6);
+           }else if (str.length == 2){
+
+
+            String startHead = str[0];
             String[] tmp = startName.split(";");
             Integer allCount = 0;
             Integer startNum = 0;
-            if (tmp.length == 2) {
-                allCount = Integer.valueOf(tmp[1]);
-                startNum = Integer.valueOf(tmp[0].trim().substring(1));
-            } else {
+
                 allCount = ALL_Count;
-                startNum = Integer.valueOf(startName.trim().substring(1));
-            }
+                startNum = Integer.valueOf(str[1].trim());
+
             Integer endNUm = startNum + allCount;
             cloudSeeScan.doScan(startNum,endNUm,FILE_PATH,startHead,SLEEP_TIME,message.getFrom().getId());
             scanRecordService.insert(startNum,endNUm,message.getFrom().getId());
-            sendMessage.setChatId(message.getChatId()).setText(OutputLine.line5);
+            sendMessage.setText(OutputLine.line5);
+           }else if (str.length == 3){
+               String startHead = str[0];
+               Integer allCount = 0;
+               Integer startNum = 0;
+
+                   allCount = Integer.valueOf(str[2]);
+                   startNum = Integer.valueOf(str[1].trim());
+
+               Integer endNUm = startNum + allCount;
+               cloudSeeScan.doScan(startNum,endNUm,FILE_PATH,startHead,SLEEP_TIME,message.getFrom().getId());
+               scanRecordService.insert(startNum,endNUm,message.getFrom().getId());
+               sendMessage.setText(OutputLine.line5);
+           }
+           else
+               sendMessage.setText(OutputLine.line7);
         }
         return sendMessage;
     }

@@ -1,10 +1,15 @@
 package com.github.xabgesagtx.example.Service.impl;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.xabgesagtx.example.dao.GroupMemberMapper;
 import com.github.xabgesagtx.example.entity.GroupMember;
+import com.github.xabgesagtx.example.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.KickChatMember;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.RestrictChatMember;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -20,6 +25,9 @@ public class GroupMemberServiceImpl {
     @Autowired
     GroupMemberMapper groupMemberMapper;
 
+    @Autowired
+    RedisUtils redisUtils;
+
     /**
      * 插入表
      * @param message
@@ -27,12 +35,14 @@ public class GroupMemberServiceImpl {
      */
     public Integer insert(Message message){
         GroupMember groupMember = new GroupMember();
+        String id = message.getChatId().toString()+"&"+message.getFrom().getId();
         groupMember.setChatId(message.getChatId().toString());
         groupMember.setUserId(message.getFrom().getId());
         groupMember.setBlackKeyword(0);
         groupMember.setPhotoCount(0);
         groupMember.setState(0);
         groupMember.setVideoCount(0);
+        redisUtils.set(id, JSON.toJSONString(groupMember));
         return groupMemberMapper.insert(groupMember);
     }
 
@@ -43,12 +53,19 @@ public class GroupMemberServiceImpl {
      */
     public Boolean isExists(Message message){
         boolean flag = false;
-        GroupMember groupMember = new GroupMember();
-        groupMember.setChatId(message.getChatId().toString());
-        groupMember.setUserId(message.getFrom().getId());
-        if (groupMemberMapper.selectCountByGroupMember(groupMember)>0){
-            flag =true;
+        String id = message.getChatId().toString()+"&"+message.getFrom().getId();
+        if (StringUtils.isEmpty(redisUtils.get(id))){
+            GroupMember groupMember = new GroupMember();
+            groupMember.setChatId(message.getChatId().toString());
+            groupMember.setUserId(message.getFrom().getId());
+            if (groupMemberMapper.selectCountByGroupMember(groupMember)>0){
+                flag = true;
+            }
+        }else {
+            flag = true;
         }
+
+
         return flag;
     }
 
@@ -71,10 +88,21 @@ public class GroupMemberServiceImpl {
      * @return
      */
     public Integer getBlackword(Message message){
-        GroupMember groupMember = new GroupMember();
+        Integer count = 0 ;
+        String id = message.getChatId().toString()+"&"+message.getFrom().getId();
+        Object object = redisUtils.get(id);
+        if (!ObjectUtils.isEmpty(object)){
+            JSONObject group =  JSON.parseObject(object.toString());
+            Integer blackKeyWordCount = Integer.valueOf(group.getString("blackKeyword"));
+            count = blackKeyWordCount;
+        }
+
+
+/*        GroupMember groupMember = new GroupMember();
         groupMember.setChatId(message.getChatId().toString());
         groupMember.setUserId(message.getFrom().getId());
-        return groupMemberMapper.selectBlackKeywordByGroupMember(groupMember);
+        return groupMemberMapper.selectBlackKeywordByGroupMember(groupMember);*/
+        return count;
     }
 
     /**
@@ -82,10 +110,21 @@ public class GroupMemberServiceImpl {
      * @param message
      */
     public void blackwordAdd(Message message){
-        GroupMember groupMember = new GroupMember();
+        String id = message.getChatId().toString()+"&"+message.getFrom().getId();
+        Object object = redisUtils.get(id);
+        if (!ObjectUtils.isEmpty(object)){
+            JSONObject group =  JSON.parseObject(object.toString());
+            Integer blackKeyWordCount = Integer.valueOf(group.getString("blackKeyword"))+1;
+            group.remove("blackKeyword");
+            group.put("blackKeyword",blackKeyWordCount);
+            redisUtils.set(id,group.toJSONString());
+        }
+
+
+/*        GroupMember groupMember = new GroupMember();
         groupMember.setChatId(message.getChatId().toString());
         groupMember.setUserId(message.getFrom().getId());
-        groupMemberMapper.updateBlackKeywordByGroupMember(groupMember);
+        groupMemberMapper.updateBlackKeywordByGroupMember(groupMember);*/
     }
 
     /**
@@ -120,6 +159,7 @@ public class GroupMemberServiceImpl {
     public void dealNewMember(Message message){
         List<User> users = message.getNewChatMembers();
         for (User user :users){
+            String id = message.getChatId().toString()+"&"+message.getFrom().getId();
             GroupMember groupMember = new GroupMember();
             groupMember.setChatId(message.getChatId().toString());
             groupMember.setUserId(user.getId());
@@ -127,7 +167,12 @@ public class GroupMemberServiceImpl {
             groupMember.setPhotoCount(0);
             groupMember.setState(0);
             groupMember.setVideoCount(0);
+            redisUtils.set(id, JSON.toJSONString(groupMember));
             groupMemberMapper.insert(groupMember);
         }
+    }
+
+    public List<GroupMember> selectAll(){
+       return groupMemberMapper.selectAll();
     }
 }

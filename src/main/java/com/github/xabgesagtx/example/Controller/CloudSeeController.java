@@ -61,10 +61,12 @@ public class CloudSeeController {
     @GetMapping(value = "/scan")
     public MyResponse scanner(HttpServletRequest request){
         MyResponse myResponse= new MyResponse(200,true);
+        String startHead = request.getParameter("fileHead");
         String startName = request.getParameter("fileName");
+        String count = request.getParameter("count");
         logger.info("请求参数为："+startName);
         if (!StringUtils.isEmpty(startName)){
-            cloudSee.execute(startName);
+            cloudSee.execute(startHead,startName,count);
         }else {
             myResponse.setCode(9999);
             myResponse.setSuccess(false);

@@ -1,52 +1,77 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.github.xabgesagtx.example.dao.VideoListMapper" >
-  <resultMap id="BaseResultMap" type="com.github.xabgesagtx.example.entity.VideoList" >
-    <result column="file_id" property="fileId" jdbcType="VARCHAR" />
-    <result column="file_type" property="fileType" jdbcType="VARCHAR" />
-    <result column="file_size" property="fileSize" jdbcType="INTEGER" />
-    <result column="file_desc" property="fileDesc" jdbcType="VARCHAR" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.xabgesagtx.example.dao.VideoListMapper">
+  <resultMap id="BaseResultMap" type="com.github.xabgesagtx.example.entity.VideoList">
+    <result column="file_id" jdbcType="VARCHAR" property="fileId" />
+    <result column="file_type" jdbcType="VARCHAR" property="fileType" />
+    <result column="file_size" jdbcType="INTEGER" property="fileSize" />
+    <result column="file_desc" jdbcType="VARCHAR" property="fileDesc" />
+    <result column="is_send" jdbcType="INTEGER" property="isSend" />
   </resultMap>
-  <insert id="insert" parameterType="com.github.xabgesagtx.example.entity.VideoList" >
+  <insert id="insertSelective" parameterType="com.github.xabgesagtx.example.entity.VideoList">
+    insert into video_list
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="fileId != null">
+        file_id,
+      </if>
+      <if test="fileType != null">
+        file_type,
+      </if>
+      <if test="fileSize != null">
+        file_size,
+      </if>
+      <if test="fileDesc != null">
+        file_desc,
+      </if>
+      <if test="isSend != null">
+        is_send,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="fileId != null">
+        #{fileId,jdbcType=VARCHAR},
+      </if>
+      <if test="fileType != null">
+        #{fileType,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSize != null">
+        #{fileSize,jdbcType=INTEGER},
+      </if>
+      <if test="fileDesc != null">
+        #{fileDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="isSend != null">
+        #{isSend,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <insert id="insert" parameterType="com.github.xabgesagtx.example.entity.VideoList">
     insert into video_list (file_id, file_type, file_size, 
       file_desc)
     values (#{fileId,jdbcType=VARCHAR}, #{fileType,jdbcType=VARCHAR}, #{fileSize,jdbcType=INTEGER}, 
       #{fileDesc,jdbcType=VARCHAR})
-  </insert>
-  <insert id="insertSelective" parameterType="com.github.xabgesagtx.example.entity.VideoList" >
-    insert into video_list
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="fileId != null" >
-        file_id,
-      </if>
-      <if test="fileType != null" >
-        file_type,
-      </if>
-      <if test="fileSize != null" >
-        file_size,
-      </if>
-      <if test="fileDesc != null" >
-        file_desc,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="fileId != null" >
-        #{fileId,jdbcType=VARCHAR},
-      </if>
-      <if test="fileType != null" >
-        #{fileType,jdbcType=VARCHAR},
-      </if>
-      <if test="fileSize != null" >
-        #{fileSize,jdbcType=INTEGER},
-      </if>
-      <if test="fileDesc != null" >
-        #{fileDesc,jdbcType=VARCHAR},
-      </if>
-    </trim>
   </insert>
   <select id="selectCountByfileId" parameterType="Integer" resultType="Integer">
     select count(1)
     from video_list
     where file_size = #{fileSize,jdbcType=INTEGER}
   </select>
+  <select id="selectByisSend" parameterType="Integer" resultType="com.github.xabgesagtx.example.entity.VideoList">
+    select file_id as fileId,
+    file_type as fileType,
+    file_size as fileSize,
+    file_desc as fileDesc,
+    is_send as isSend
+    from video_list
+    where is_send =  #{isSend,jdbcType=INTEGER}
+    LIMIT 1
+  </select>
+
+
+  <update id="updateIsSendByFileid" parameterType="String" >
+    update video_list
+    set is_send = 1
+    where file_id = #{fileId,jdbcType=VARCHAR}
+  </update>
+
 </mapper>
