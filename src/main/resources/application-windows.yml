@@ -22,9 +22,9 @@ spring:
   thymeleaf:
     cache: false
   datasource:
-    url: jdbc:mysql://test.yangge666.top:3306/telegram?serverTimezone=UTC
-    username: telegram
-    password: telegram
+    url: jdbc:mysql://test.yangge666.top:3306/telegramwindows?serverTimezone=UTC
+    username: telegramwindows
+    password: telegramwindows
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis:
@@ -39,3 +39,18 @@ mythread:
   maxpoolsize: 128
   #队列长度
   queuecapacity: 99999
+
+
+  #设置redis服务器
+redis:
+  host: 127.0.0.1   #redis的服务器地址
+  password:        #设置密码
+  jedis:
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 500
+      min-idle: 0
+  lettuce:
+    shutdown-timeout: 30000
+
