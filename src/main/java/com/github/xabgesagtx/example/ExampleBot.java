@@ -151,11 +151,7 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
 
 
                     if (message.hasVideo()) {
-                        try {
-                            execute(videoMessage.deal2(message));
-                        } catch (TelegramApiException e) {
-                            logger.info("资源入库报错了！！！"+e.toString());
-                        }
+                        videoMessage.deal2(message);
                     }
                 }
 

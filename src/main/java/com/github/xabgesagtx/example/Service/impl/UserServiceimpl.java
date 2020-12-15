@@ -1,6 +1,7 @@
 package com.github.xabgesagtx.example.Service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPObject;
 import com.github.xabgesagtx.example.Service.UserService;
 import com.github.xabgesagtx.example.dao.UserMapper;
@@ -40,12 +41,21 @@ public class UserServiceimpl implements UserService {
     @Override
     public boolean isAdmin(Integer id) {
         Boolean flag = false;
-        User user = userMapper.selectByPrimaryKey(id);
+        Object object = redisUtils.get(id.toString());
+        JSONObject jsonObject =JSON.parseObject(object.toString());
+        String isAdmin = jsonObject.getString("isAdmin");
+        if (!StringUtils.isEmpty(isAdmin)){
+            if ("1".equals(isAdmin)){
+                flag =true;
+            }
+        }
+        //修改直接从redis中取数据
+/*        User user = userMapper.selectByPrimaryKey(id);
         if (!ObjectUtils.isEmpty(user)){
             if ("1".equals(user.getIsAdmin().toString())){
                 flag =true;
             }
-        }
+        }*/
         return flag;
     }
 
@@ -54,11 +64,14 @@ public class UserServiceimpl implements UserService {
         Boolean flag = true;
         String stukey = (String) redisUtils.get(id.toString());
         if (StringUtils.isEmpty(stukey)){
+            return false;
+        }
+/*        if (StringUtils.isEmpty(stukey)){
             User user = userMapper.selectByPrimaryKey(id);
             if (ObjectUtils.isEmpty(user)){
                 flag = false;
             }
-        }
+        }*/
         return flag;
     }
 

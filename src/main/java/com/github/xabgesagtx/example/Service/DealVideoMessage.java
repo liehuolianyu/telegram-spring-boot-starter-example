@@ -45,8 +45,8 @@ public class DealVideoMessage {
      * @param message
      * @return
      */
-    public SendMessage deal2(Message message){
-        SendMessage sendMessage = new SendMessage().setChatId(message.getChatId());
+    public void deal2(Message message){
+
 /*        List<ChatList> chatLists =  chatListService.selectAll();*/
         VideoList videoList = new VideoList();
         if (!videoListService.isExists(message.getVideo().getFileSize())){
@@ -64,8 +64,6 @@ public class DealVideoMessage {
             sendVideos.add(sendVideo);
         }*/
         /*sendVideo.setChatId("-1001387318488");*/
-        sendMessage.setText("已成功入库");
-        return sendMessage;
     }
 
 
