@@ -115,12 +115,17 @@ public class DealCloudSee2 {
                Integer startNum = 0;
 
                    allCount = Integer.valueOf(str[2]);
-                   startNum = Integer.valueOf(str[1].trim());
+                   if (allCount>1000000){
+                       sendMessage.setText(OutputLine.line8);
+                   }else {
+                       startNum = Integer.valueOf(str[1].trim());
 
-               Integer endNUm = startNum + allCount;
-               cloudSeeScan.doScan(startNum,endNUm,FILE_PATH,startHead,SLEEP_TIME,message.getFrom().getId());
-               scanRecordService.insert(startNum,endNUm,message.getFrom().getId());
-               sendMessage.setText(OutputLine.line5);
+
+                       Integer endNUm = startNum + allCount;
+                       cloudSeeScan.doScan(startNum, endNUm, FILE_PATH, startHead, SLEEP_TIME, message.getFrom().getId());
+                       scanRecordService.insert(startNum, endNUm, message.getFrom().getId());
+                       sendMessage.setText(OutputLine.line5);
+                   }
            }
            else
                sendMessage.setText(OutputLine.line7);

@@ -155,7 +155,8 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
                     }
                 }
 
-                //
+
+                //普通用户私聊处理
 
                 else {
                     //处理文字消息

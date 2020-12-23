@@ -64,6 +64,7 @@ public class DealVideoMessage {
             sendVideos.add(sendVideo);
         }*/
         /*sendVideo.setChatId("-1001387318488");*/
+        logger.info("插入视频资源表成功");
     }
 
 
