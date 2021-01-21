@@ -7,6 +7,7 @@ import com.github.xabgesagtx.example.Service.UserService;
 import com.github.xabgesagtx.example.dao.UserMapper;
 import com.github.xabgesagtx.example.dao.UserMapper;
 import com.github.xabgesagtx.example.entity.User;
+import com.github.xabgesagtx.example.utils.RedisUtil;
 import com.github.xabgesagtx.example.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class UserServiceimpl implements UserService {
     UserMapper userMapper;
 
     @Autowired
-    RedisUtils redisUtils;
+    RedisUtil redisUtils;
 
     @Override
     public Integer insert(Message message) {

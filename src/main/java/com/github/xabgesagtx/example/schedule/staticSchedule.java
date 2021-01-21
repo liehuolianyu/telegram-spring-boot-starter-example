@@ -5,10 +5,9 @@ import com.alibaba.fastjson.JSON;
 import com.github.xabgesagtx.example.ExampleBot;
 import com.github.xabgesagtx.example.Service.UserService;
 import com.github.xabgesagtx.example.Service.impl.GroupMemberServiceImpl;
-import com.github.xabgesagtx.example.dao.UserMapper;
 import com.github.xabgesagtx.example.entity.GroupMember;
 import com.github.xabgesagtx.example.entity.User;
-import com.github.xabgesagtx.example.utils.RedisUtils;
+import com.github.xabgesagtx.example.utils.RedisUtil;
 import com.github.xabgesagtx.example.utils.ScheduleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ public class staticSchedule implements ApplicationRunner {
     UserService userService;
 
     @Autowired
-    RedisUtils redisUtils;
+    RedisUtil redisUtils;
 
     @Autowired
     GroupMemberServiceImpl groupMemberService;
