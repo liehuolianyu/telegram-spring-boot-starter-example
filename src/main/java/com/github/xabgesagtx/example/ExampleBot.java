@@ -12,6 +12,7 @@ import com.github.xabgesagtx.example.entity.ChatList;
 import com.github.xabgesagtx.example.entity.VideoList;
 import com.github.xabgesagtx.example.utils.OutputLine;
 import com.github.xabgesagtx.example.utils.ScheduleUtils;
+import com.github.xabgesagtx.example.utils.SensitiveWordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatPhoto;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -107,7 +110,7 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
                     groupMemberService.insert(message);
                 }
                 if (message.hasText()) {
-                    if (message.getText().contains(OutputLine.blackline1) || message.getText().contains(OutputLine.blackline2)) {
+                    if (SensitiveWordUtil.contains(message.getText())) {
                         if (groupMemberService.getBlackword(message) > 3) {
                             try {
                                 execute(groupMemberService.kitoutMember(message));
@@ -138,13 +141,30 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
                             } catch (TelegramApiException e) {
                                 logger.error("扫描处理失败，原因为：" + e.toString());
                             }
-                        } else if (message.getText().startsWith("/")) {
+                        } else if (message.getText().startsWith(OutputLine.addSensitiveWord)){
+                            try {
+                                execute(textMessage.add(message));
+                            } catch (TelegramApiException e) {
+                                logger.error("回复文本失败，具体原因：" + e.toString());
+                            }
+                        }
+
+
+                            else if (message.getText().startsWith("/")) {
 
                             //只处理“/”开头的数据
                             try {
                                 execute(textMessage.deal(message));
                             } catch (TelegramApiException e) {
                                 logger.error("回复文本失败，具体原因：" + e.toString());
+                            }
+                        }else {
+                            if (SensitiveWordUtil.contains(message.getText())){
+                                try {
+                                    execute(new SendMessage().setChatId(message.getChatId()).setText("包含敏感词"));
+                                } catch (TelegramApiException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     }
@@ -208,8 +228,8 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
             if (!CollectionUtils.isEmpty(chatLists)) {
                 for (ChatList chatList : chatLists) {
                     for (VideoList videoList : videoLists) {
-                        sendVideo.setChatId(chatList.getId()).setVideo(new InputFile(videoList.getFileId()))
-                                .setCaption(videoList.getFileDesc());
+                        sendVideo.setChatId(chatList.getId()).setVideo(new InputFile(videoList.getFileId()));
+                               /* .setCaption(videoList.getFileDesc());*/
                         try {
                             execute(sendVideo);
                             videoListService.updateIsSendByFileid(videoList.getFileId());
@@ -221,5 +241,15 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
             }
         }
     }
+
+    @Override
+    public void sendMessage(SendMessage sendMessage)  {
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

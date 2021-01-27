@@ -3,12 +3,14 @@ package com.github.xabgesagtx.example.schedule;
 
 import com.alibaba.fastjson.JSON;
 import com.github.xabgesagtx.example.ExampleBot;
+import com.github.xabgesagtx.example.Service.SensitiveWordService;
 import com.github.xabgesagtx.example.Service.UserService;
 import com.github.xabgesagtx.example.Service.impl.GroupMemberServiceImpl;
 import com.github.xabgesagtx.example.entity.GroupMember;
 import com.github.xabgesagtx.example.entity.User;
 import com.github.xabgesagtx.example.utils.RedisUtil;
 import com.github.xabgesagtx.example.utils.ScheduleUtils;
+import com.github.xabgesagtx.example.utils.SensitiveWordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -34,6 +37,9 @@ public class staticSchedule implements ApplicationRunner {
     RedisUtil redisUtils;
 
     @Autowired
+    SensitiveWordService sensitiveWordService;
+
+    @Autowired
     GroupMemberServiceImpl groupMemberService;
 
 
@@ -44,6 +50,9 @@ public class staticSchedule implements ApplicationRunner {
     public void timerSendVideo(){
         scheduleUtils.timerSendVideo();
     }
+
+
+
 
 
     /**
@@ -67,6 +76,12 @@ public class staticSchedule implements ApplicationRunner {
        }
 
        logger.info("初始化redis数据成功");
+
+
+        SensitiveWordUtil.init(new HashSet<>(sensitiveWordService.getAllSensitiveWord()));
+
+        logger.info("敏感词初始化成功");
+
 
     }
 

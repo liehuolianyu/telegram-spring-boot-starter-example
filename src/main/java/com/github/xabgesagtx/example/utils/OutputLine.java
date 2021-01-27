@@ -25,6 +25,8 @@ public class OutputLine {
 
     public static final String getchat = "/getchat";
 
+    public static final String addSensitiveWord = "/add";
+
 
     /**
      * 关键词
