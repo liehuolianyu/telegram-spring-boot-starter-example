@@ -1,7 +1,8 @@
 package com.github.xabgesagtx.example.dao;
 
 import com.github.xabgesagtx.example.entity.ScanRecord;
-import com.github.xabgesagtx.example.entity.User;
+
+import java.util.List;
 
 public interface ScanRecordMapper {
     int deleteByPrimaryKey(Integer id);
@@ -16,7 +17,11 @@ public interface ScanRecordMapper {
 
     int updateByPrimaryKey(ScanRecord record);
 
-    int selectCountByUserId(Integer userId);
+     int selectCountByUserId(Integer userid);
 
-    int updateByUserId(ScanRecord record);
+     int updateByUserId(ScanRecord record);
+
+    List<ScanRecord> selectNotScan(Integer state);
+
+   Integer updateScanDateById(Integer id);
 }

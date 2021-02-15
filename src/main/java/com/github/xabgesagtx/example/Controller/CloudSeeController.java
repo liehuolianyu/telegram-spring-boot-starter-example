@@ -1,6 +1,7 @@
 package com.github.xabgesagtx.example.Controller;
 
 import com.github.xabgesagtx.example.Service.DealCloudSee2;
+import com.github.xabgesagtx.example.jni.Jni;
 import com.github.xabgesagtx.example.utils.FileUtils;
 import com.github.xabgesagtx.example.utils.MyResponse;
 import org.slf4j.Logger;
@@ -66,11 +67,29 @@ public class CloudSeeController {
         String count = request.getParameter("count");
         logger.info("请求参数为："+startName);
         if (!StringUtils.isEmpty(startName)){
-            cloudSee.execute(startHead,startName,count);
+
+            //原有调用第三方接口，已修改为调用Jni本地接口
+          /*  cloudSee.execute(startHead,startName,count);*/
+            cloudSee.scanNew(startHead,startName,count);
         }else {
             myResponse.setCode(9999);
             myResponse.setSuccess(false);
         }
         return myResponse;
+    }
+
+    @GetMapping(value = "/init")
+    public int init(HttpServletRequest request){
+        return Jni.initSdk();
+    }
+
+    @GetMapping(value = "/onlineTest")
+    public int onlineTest(HttpServletRequest request){
+        return Jni.isDeviceOnline("T",117760489,600);
+    }
+
+    @GetMapping(value = "/destory")
+    public void destory(HttpServletRequest request){
+         Jni.destory();
     }
 }

@@ -28,7 +28,7 @@ public class cloudSeeScan {
     {
         for (; startNum <= endNUm; startNum++) {
             try {
-                cloudSee.executeForTelegram(FILE_PATH + startHead + endNUm + ".txt", startHead + startNum,endNUm,userId);
+                cloudSee.executeForTelegram(FILE_PATH + startHead + endNUm + ".txt", startHead ,startNum,endNUm,userId);
                 Thread.sleep(SLEEP_TIME);
             } catch (InterruptedException e) {
                 try {

@@ -241,7 +241,7 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
         }
     }
 
-    @Override
+
     public void sendMessage(SendMessage sendMessage)  {
         try {
             execute(sendMessage);
@@ -280,6 +280,16 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
             execute(deleteMessage);
         } catch (TelegramApiException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void scheduleSendMessage(Integer userid,String text){
+        SendMessage sendMessage = new SendMessage().setChatId(String.valueOf(userid)).setText(text);
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            logger.error("发送文本<<"+sendMessage.getText().toString()+">>失败，具体原因：" + e.toString());
         }
     }
 }

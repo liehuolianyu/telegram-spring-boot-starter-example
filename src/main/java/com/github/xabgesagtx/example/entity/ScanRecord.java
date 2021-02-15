@@ -5,6 +5,8 @@ import java.util.Date;
 public class ScanRecord {
     private Integer id;
 
+    private String startHead;
+
     private Integer userId;
 
     private Integer startNum;
@@ -17,12 +19,24 @@ public class ScanRecord {
 
     private Date scanFinishDate;
 
+    private Date createDate;
+
+    private Integer downloadFlag;
+
     public Integer getId() {
         return id;
     }
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getStartHead() {
+        return startHead;
+    }
+
+    public void setStartHead(String startHead) {
+        this.startHead = startHead == null ? null : startHead.trim();
     }
 
     public Integer getUserId() {
@@ -71,5 +85,21 @@ public class ScanRecord {
 
     public void setScanFinishDate(Date scanFinishDate) {
         this.scanFinishDate = scanFinishDate;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Integer getDownloadFlag() {
+        return downloadFlag;
+    }
+
+    public void setDownloadFlag(Integer downloadFlag) {
+        this.downloadFlag = downloadFlag;
     }
 }

@@ -3,21 +3,27 @@ package com.github.xabgesagtx.example.schedule;
 
 import com.alibaba.fastjson.JSON;
 import com.github.xabgesagtx.example.ExampleBot;
+import com.github.xabgesagtx.example.Service.ScanRecordService;
 import com.github.xabgesagtx.example.Service.SensitiveWordService;
 import com.github.xabgesagtx.example.Service.UserService;
+import com.github.xabgesagtx.example.Service.cloudSeeScan;
 import com.github.xabgesagtx.example.Service.impl.GroupMemberServiceImpl;
 import com.github.xabgesagtx.example.entity.GroupMember;
+import com.github.xabgesagtx.example.entity.ScanRecord;
 import com.github.xabgesagtx.example.entity.User;
+import com.github.xabgesagtx.example.jni.Jni;
 import com.github.xabgesagtx.example.utils.RedisUtil;
 import com.github.xabgesagtx.example.utils.ScheduleUtils;
 import com.github.xabgesagtx.example.utils.SensitiveWordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +48,18 @@ public class staticSchedule implements ApplicationRunner {
     @Autowired
     GroupMemberServiceImpl groupMemberService;
 
+    @Autowired
+    cloudSeeScan cloudSeeScan;
+
+    @Autowired
+    ScanRecordService scanRecordService;
+
+    @Value("${file.outputpath}")
+    private  String FILE_PATH ;
+
+    @Value("${file.sleep}")
+    private Long SLEEP_TIME;
+
 
     /**
      * 定时群中发送视频
@@ -50,6 +68,21 @@ public class staticSchedule implements ApplicationRunner {
     public void timerSendVideo(){
         scheduleUtils.timerSendVideo();
     }
+
+
+
+    public void timerScanCloudsee(){
+        List<ScanRecord> scanRecordList =  scanRecordService.selectNotScan(0);
+        if (!CollectionUtils.isEmpty(scanRecordList)){
+            for (ScanRecord scanRecord : scanRecordList){
+                cloudSeeScan.doScan(scanRecord.getStartNum(),scanRecord.getEndNum(),FILE_PATH,scanRecord.getStartHead(),SLEEP_TIME,scanRecord.getUserId());
+                scanRecordService.updateScanDateById(scanRecord.getId());
+            }
+
+        }
+
+    }
+
 
 
 
@@ -81,6 +114,13 @@ public class staticSchedule implements ApplicationRunner {
         SensitiveWordUtil.init(new HashSet<>(sensitiveWordService.getAllSensitiveWord()));
 
         logger.info("敏感词初始化成功");
+
+        Integer result =  Jni.initSdk();
+        if (1==result){
+            logger.info("sdk初始化成功");
+        }else {
+            logger.info("sdk初始化失败");
+        }
 
 
     }

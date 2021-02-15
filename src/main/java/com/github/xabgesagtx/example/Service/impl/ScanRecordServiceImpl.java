@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 
 @Service
@@ -28,19 +29,30 @@ public class ScanRecordServiceImpl implements ScanRecordService {
     }
 
     @Override
-    public Integer insert(Integer startNUm,Integer endNUm,Integer userId) {
+    public Integer insert(String startHead,Integer startNUm,Integer endNUm,Integer userId) {
         ScanRecord record = new ScanRecord();
         record.setStartNum(startNUm);
         record.setEndNum(endNUm);
         record.setUserId(userId);
         record.setIsFinish(0);
-        record.setScanDate(new Date());
+        record.setCreateDate(new Date());
+        record.setStartHead(startHead);
         return scanRecordMapper.insert(record);
     }
 
     @Override
     public Integer updateByUserId(ScanRecord record) {
        return scanRecordMapper.updateByUserId(record);
+    }
+
+    @Override
+    public List<ScanRecord> selectNotScan(Integer state) {
+        return scanRecordMapper.selectNotScan(state);
+    }
+
+    @Override
+    public Integer updateScanDateById(Integer id) {
+        return scanRecordMapper.updateScanDateById(id);
     }
 
 }

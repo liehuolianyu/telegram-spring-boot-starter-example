@@ -84,6 +84,49 @@ public class DealCloudSee2 {
     }
 
 
+    @Async
+    public void scanNew(String startHead, String startName,String count ){
+        ReentrantLock lock = new ReentrantLock();
+        Integer allCount = 0;
+        Integer startNum = Integer.valueOf(startName);
+        startNum = Integer.valueOf(startName);
+        if (!StringUtils.isEmpty(count)){
+            allCount = Integer.valueOf(count);
+
+        }else {
+            allCount = ALL_Count;
+        }
+        Integer endNUm = startNum+allCount;
+
+        /*        List<String> result = new CopyOnWriteArrayList<>();*/
+
+
+        for (; startNum <= endNUm; startNum++) {
+            try {
+                cloudSee.scanNew(FILE_PATH + startHead + endNUm + ".txt", startHead ,startNum);
+                Thread.sleep(SLEEP_TIME);
+            } catch (InterruptedException e) {
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+                logger.info(e.getMessage());
+            }
+            //老方法放在list中，导致丢失部分数据
+/*            lock.lock();
+            if (result.size() >= 2) {
+                logger.info("已扫描超过10个，先写入文件，最后扫描值为：" + startNum);
+                FileUtils.FileWriteListforTure(, result);
+            }
+            lock.unlock();*/
+
+        }
+        logger.info("已扫描完成，写入文件，最后扫描值为：" + startNum);
+        /* FileUtils.FileWriteListforTure(FILE_PATH + startHead + endNUm + ".txt", result);*/
+    }
+
+
     public SendMessage dealMessage(Message message) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId());
@@ -106,8 +149,9 @@ public class DealCloudSee2 {
                 startNum = Integer.valueOf(str[1].trim());
 
             Integer endNUm = startNum + allCount;
-            cloudSeeScan.doScan(startNum,endNUm,FILE_PATH,startHead,SLEEP_TIME,message.getFrom().getId());
-            scanRecordService.insert(startNum,endNUm,message.getFrom().getId());
+            //改为定时任务调用
+            /*cloudSeeScan.doScan(startNum,endNUm,FILE_PATH,startHead,SLEEP_TIME,message.getFrom().getId());*/
+            scanRecordService.insert(startHead,startNum,endNUm,message.getFrom().getId());
             sendMessage.setText(OutputLine.line5);
            }else if (str.length == 3){
                String startHead = str[0];
@@ -122,8 +166,9 @@ public class DealCloudSee2 {
 
 
                        Integer endNUm = startNum + allCount;
-                       cloudSeeScan.doScan(startNum, endNUm, FILE_PATH, startHead, SLEEP_TIME, message.getFrom().getId());
-                       scanRecordService.insert(startNum, endNUm, message.getFrom().getId());
+                       //改为定时任务调用
+                     /*  cloudSeeScan.doScan(startNum, endNUm, FILE_PATH, startHead, SLEEP_TIME, message.getFrom().getId());*/
+                       scanRecordService.insert(startHead,startNum, endNUm, message.getFrom().getId());
                        sendMessage.setText(OutputLine.line5);
                    }
            }
