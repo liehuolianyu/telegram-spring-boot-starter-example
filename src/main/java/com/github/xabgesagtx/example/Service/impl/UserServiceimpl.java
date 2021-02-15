@@ -2,16 +2,12 @@ package com.github.xabgesagtx.example.Service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPObject;
 import com.github.xabgesagtx.example.Service.UserService;
-import com.github.xabgesagtx.example.dao.UserMapper;
 import com.github.xabgesagtx.example.dao.UserMapper;
 import com.github.xabgesagtx.example.entity.User;
 import com.github.xabgesagtx.example.utils.RedisUtil;
-import com.github.xabgesagtx.example.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.meta.api.objects.Message;
 

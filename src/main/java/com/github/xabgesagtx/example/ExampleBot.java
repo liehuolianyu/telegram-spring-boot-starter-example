@@ -21,11 +21,15 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
-import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatPhoto;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.RestrictChatMember;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
@@ -45,6 +49,9 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
 
     @Value("${bot.username}")
     private String username;
+
+    @Value("${bot.blackword}")
+    private int blackword;
 
 
     @Autowired
@@ -111,20 +118,24 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
                 }
                 if (message.hasText()) {
                     if (SensitiveWordUtil.contains(message.getText())) {
-                        if (groupMemberService.getBlackword(message) > 3) {
+                        if (groupMemberService.getBlackword(message) >= blackword) {
                             try {
                                 execute(groupMemberService.kitoutMember(message));
                                 execute(groupMemberService.sendWarning(message.getChatId(), "用户：" + message.getFrom().getFirstName() + "因发送违禁词超过三次被永久踢出群"));
+
                             } catch (TelegramApiException e) {
                                 e.printStackTrace();
                             }
                         } else {
                             groupMemberService.blackwordAdd(message);
-                            try {
-                                execute(groupMemberService.sendWarning(message.getChatId(), "用户：" + message.getFrom().getFirstName() + ",您已发布了违禁词，若发满三次将被永久踢出群，请注意您的用词"));
-                            } catch (TelegramApiException e) {
-                                e.printStackTrace();
-                            }
+                            sendMessage(groupMemberService.sendWarning(message.getChatId(), "用户：" + message.getFrom().getFirstName() + ",您已发布了违禁词，若发满三次将被永久踢出群，请注意您的用词！！！"+"\n已撤回违禁消息"));
+
+                                if (message.getChat().isSuperGroupChat()){
+                                    restrictChatMember(groupMemberService.modifyUser(message));
+                                    deleteMessage(groupMemberService.deleteMessage(message));
+                                }
+
+
                         }
                     }
                 }
@@ -136,35 +147,26 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
                 if (userServiceimpl.isAdmin(message.getFrom().getId())) {
                     if (message.hasText()) {
                         if (message.getText().startsWith(OutputLine.scan)) {
-                            try {
-                                execute(cloudSee2.dealMessage(message));
-                            } catch (TelegramApiException e) {
-                                logger.error("扫描处理失败，原因为：" + e.toString());
-                            }
+                            sendMessage(cloudSee2.dealMessage(message));
                         } else if (message.getText().startsWith(OutputLine.addSensitiveWord)){
-                            try {
-                                execute(textMessage.add(message));
-                            } catch (TelegramApiException e) {
-                                logger.error("回复文本失败，具体原因：" + e.toString());
-                            }
+                            sendMessage(textMessage.add(message));
                         }
 
 
                             else if (message.getText().startsWith("/")) {
 
                             //只处理“/”开头的数据
-                            try {
-                                execute(textMessage.deal(message));
-                            } catch (TelegramApiException e) {
-                                logger.error("回复文本失败，具体原因：" + e.toString());
-                            }
-                        }else {
+
+                            sendMessage(textMessage.deal(message));
+
+                        }else if (message.hasVideo()){
+
+
+                        }
+
+                            else {
                             if (SensitiveWordUtil.contains(message.getText())){
-                                try {
-                                    execute(new SendMessage().setChatId(message.getChatId()).setText("包含敏感词"));
-                                } catch (TelegramApiException e) {
-                                    e.printStackTrace();
-                                }
+                                sendMessage(new SendMessage().setChatId(message.getChatId()).setText("包含敏感词"));
                             }
                         }
                     }
@@ -172,6 +174,14 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
 
                     if (message.hasVideo()) {
                         videoMessage.deal2(message);
+
+
+/*                        SendVideo sendVideo = new SendVideo().setChatId(message.getChatId()).setVideo(new InputFile(message.getVideo().getFileId()));
+                        sendVideo.setCaption("<a href=\"http://www.runoob.com\">访问菜鸟教程!</a>");
+                        sendVideo.setParseMode("HTML");
+                        sendVideo(sendVideo);*/
+
+
                     }
                 }
 
@@ -183,29 +193,20 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
                     if (message.hasText()) {
                         //只处理“/”开头的数据
                         if (message.getText().startsWith("/")) {
-                            try {
-                                execute(textMessage.deal(message));
-                            } catch (TelegramApiException e) {
-                                logger.error("回复文本失败，具体原因：" + e.toString());
-                            }
+
+                          sendMessage(textMessage.deal(message));
                         }
                     }
                     if (message.hasPhoto()) {
-                        try {
-                            execute(photoMessage.deal(message));
-                        } catch (TelegramApiException e) {
-                            logger.error("回复图片失败，具体原因：" + e.toString());
-                        }
+
+                        sendPhoto(photoMessage.deal(message));
+
                     }
                     if (message.hasEntities()) {
 
                     }
                     if (message.hasVideo()) {
-                        try {
-                            execute(videoMessage.deal(message));
-                        } catch (TelegramApiException e) {
-                            logger.error("回复视频失败，具体原因：" + e.toString());
-                        }
+                        sendVideo(videoMessage.deal(message));
                     }
 
                 }
@@ -224,18 +225,16 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
         List<VideoList> videoLists = videoListService.selectNotSend(0);
         if (!CollectionUtils.isEmpty(videoLists)) {
             SendVideo sendVideo = new SendVideo();
+            ReplyKeyboard keyboard = new ReplyKeyboardMarkup();
             List<ChatList> chatLists = chatListService.selectAll();
             if (!CollectionUtils.isEmpty(chatLists)) {
                 for (ChatList chatList : chatLists) {
                     for (VideoList videoList : videoLists) {
                         sendVideo.setChatId(chatList.getId()).setVideo(new InputFile(videoList.getFileId()));
                                /* .setCaption(videoList.getFileDesc());*/
-                        try {
-                            execute(sendVideo);
-                            videoListService.updateIsSendByFileid(videoList.getFileId());
-                        } catch (TelegramApiException e) {
-                            logger.error("主动发送视频报错了：" + e.toString());
-                        }
+
+                        sendVideo(sendVideo);
+                        videoListService.updateIsSendByFileid(videoList.getFileId());
                     }
                 }
             }
@@ -247,9 +246,40 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error("发送文本<<"+sendMessage.getText().toString()+">>失败，具体原因：" + e.toString());
         }
     }
 
 
+    public void sendVideo(SendVideo sendVideo){
+        try {
+            execute(sendVideo);
+        } catch (TelegramApiException e) {
+            logger.error("发送视频失败，具体原因：" + e.toString());
+        }
+    }
+
+    public void sendPhoto(SendPhoto sendPhoto){
+        try {
+            execute(sendPhoto);
+        } catch (TelegramApiException e) {
+            logger.error("发送图片失败，具体原因：" + e.toString());
+        }
+    }
+
+    public void restrictChatMember(RestrictChatMember restrictMember){
+        try {
+            execute(restrictMember);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteMessage(DeleteMessage deleteMessage){
+        try {
+            execute(deleteMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -5,14 +5,17 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.xabgesagtx.example.dao.GroupMemberMapper;
 import com.github.xabgesagtx.example.entity.GroupMember;
-import com.github.xabgesagtx.example.utils.RedisUtils;
+import com.github.xabgesagtx.example.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.KickChatMember;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.RestrictChatMember;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.objects.ChatPermissions;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -26,7 +29,7 @@ public class GroupMemberServiceImpl {
     GroupMemberMapper groupMemberMapper;
 
     @Autowired
-    RedisUtils redisUtils;
+    RedisUtil redisUtil;
 
     /**
      * 插入表
@@ -42,7 +45,7 @@ public class GroupMemberServiceImpl {
         groupMember.setPhotoCount(0);
         groupMember.setState(0);
         groupMember.setVideoCount(0);
-        redisUtils.set(id, JSON.toJSONString(groupMember));
+        redisUtil.set(id, JSON.toJSONString(groupMember));
         return groupMemberMapper.insert(groupMember);
     }
 
@@ -54,7 +57,7 @@ public class GroupMemberServiceImpl {
     public Boolean isExists(Message message){
         boolean flag = false;
         String id = message.getChatId().toString()+"&"+message.getFrom().getId();
-        if (StringUtils.isEmpty(redisUtils.get(id))){
+        if (StringUtils.isEmpty(redisUtil.get(id))){
             GroupMember groupMember = new GroupMember();
             groupMember.setChatId(message.getChatId().toString());
             groupMember.setUserId(message.getFrom().getId());
@@ -90,7 +93,7 @@ public class GroupMemberServiceImpl {
     public Integer getBlackword(Message message){
         Integer count = 0 ;
         String id = message.getChatId().toString()+"&"+message.getFrom().getId();
-        Object object = redisUtils.get(id);
+        Object object = redisUtil.get(id);
         if (!ObjectUtils.isEmpty(object)){
             JSONObject group =  JSON.parseObject(object.toString());
             Integer blackKeyWordCount = Integer.valueOf(group.getString("blackKeyword"));
@@ -111,13 +114,13 @@ public class GroupMemberServiceImpl {
      */
     public void blackwordAdd(Message message){
         String id = message.getChatId().toString()+"&"+message.getFrom().getId();
-        Object object = redisUtils.get(id);
+        Object object = redisUtil.get(id);
         if (!ObjectUtils.isEmpty(object)){
             JSONObject group =  JSON.parseObject(object.toString());
             Integer blackKeyWordCount = Integer.valueOf(group.getString("blackKeyword"))+1;
             group.remove("blackKeyword");
             group.put("blackKeyword",blackKeyWordCount);
-            redisUtils.set(id,group.toJSONString());
+            redisUtil.set(id,group.toJSONString());
         }
 
 
@@ -167,12 +170,37 @@ public class GroupMemberServiceImpl {
             groupMember.setPhotoCount(0);
             groupMember.setState(0);
             groupMember.setVideoCount(0);
-            redisUtils.set(id, JSON.toJSONString(groupMember));
+            redisUtil.set(id, JSON.toJSONString(groupMember));
             groupMemberMapper.insert(groupMember);
         }
     }
 
     public List<GroupMember> selectAll(){
        return groupMemberMapper.selectAll();
+    }
+
+
+    /**
+     * 修改用户权限，此处用于禁言
+     * @param message
+     * @return
+     */
+    public RestrictChatMember modifyUser(Message message){
+        RestrictChatMember restrictChatMember = new RestrictChatMember();
+        restrictChatMember.setChatId(message.getChatId());
+        restrictChatMember.setUserId(message.getFrom().getId());
+        restrictChatMember.setUntilDate(600);
+        restrictChatMember.setCanAddWebPagePreviews(false);
+        restrictChatMember.setCanSendOtherMessages(false);
+        restrictChatMember.setCanSendMessages(false);
+        restrictChatMember.setCanSendMediaMessages(false);
+        restrictChatMember.setPermissions( new ChatPermissions());
+        return restrictChatMember;
+    }
+
+
+    public DeleteMessage deleteMessage(Message message){
+        DeleteMessage deleteMessage = new DeleteMessage().setChatId(message.getChatId()).setMessageId(message.getMessageId());
+        return deleteMessage;
     }
 }
