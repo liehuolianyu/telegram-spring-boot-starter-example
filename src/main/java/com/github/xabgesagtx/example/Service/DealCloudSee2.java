@@ -1,7 +1,6 @@
 package com.github.xabgesagtx.example.Service;
 
 import com.github.xabgesagtx.example.Service.impl.ScanRecordServiceImpl;
-import com.github.xabgesagtx.example.utils.FileUtils;
 import com.github.xabgesagtx.example.utils.OutputLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +12,6 @@ import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Service
@@ -89,7 +86,6 @@ public class DealCloudSee2 {
         ReentrantLock lock = new ReentrantLock();
         Integer allCount = 0;
         Integer startNum = Integer.valueOf(startName);
-        startNum = Integer.valueOf(startName);
         if (!StringUtils.isEmpty(count)){
             allCount = Integer.valueOf(count);
 

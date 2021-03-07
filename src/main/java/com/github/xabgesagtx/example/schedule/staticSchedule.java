@@ -60,26 +60,30 @@ public class staticSchedule implements ApplicationRunner {
     @Value("${file.sleep}")
     private Long SLEEP_TIME;
 
+    @Value("${bot.isLinux}")
+    private boolean IS_LINUX;
+
+
+
 
     /**
      * 定时群中发送视频
      */
-    @Scheduled(cron = "30 40 * * * ?")
+    @Scheduled(cron = "0 0 0,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?")
     public void timerSendVideo(){
         scheduleUtils.timerSendVideo();
     }
 
 
-
+    @Scheduled(cron = "0 5 * * * ?")
     public void timerScanCloudsee(){
-        List<ScanRecord> scanRecordList =  scanRecordService.selectNotScan(0);
-        if (!CollectionUtils.isEmpty(scanRecordList)){
-            for (ScanRecord scanRecord : scanRecordList){
-                cloudSeeScan.doScan(scanRecord.getStartNum(),scanRecord.getEndNum(),FILE_PATH,scanRecord.getStartHead(),SLEEP_TIME,scanRecord.getUserId());
-                scanRecordService.updateScanDateById(scanRecord.getId());
-            }
+        cloudSeeScan.ScanSchedual();
 
-        }
+    }
+
+    @Scheduled(cron = "0 5 * * * ?")
+    public void timerScanRecode(){
+
 
     }
 
@@ -115,12 +119,15 @@ public class staticSchedule implements ApplicationRunner {
 
         logger.info("敏感词初始化成功");
 
-        Integer result =  Jni.initSdk();
-        if (1==result){
-            logger.info("sdk初始化成功");
-        }else {
-            logger.info("sdk初始化失败");
+        if (IS_LINUX){
+            Integer result =  Jni.initSdk();
+            if (1==result){
+                logger.info("sdk初始化成功");
+            }else {
+                logger.info("sdk初始化失败");
+            }
         }
+
 
 
     }

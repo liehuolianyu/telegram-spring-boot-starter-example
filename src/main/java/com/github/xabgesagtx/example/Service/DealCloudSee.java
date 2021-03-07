@@ -5,20 +5,17 @@ import com.github.xabgesagtx.example.Service.impl.ScanRecordServiceImpl;
 import com.github.xabgesagtx.example.entity.ScanRecord;
 import com.github.xabgesagtx.example.jni.Jni;
 import com.github.xabgesagtx.example.utils.FileUtils;
-import com.github.xabgesagtx.example.utils.ScheduleUtils;
 import com.github.xabgesagtx.example.utils.httpsPost;
 import org.jsoup.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class DealCloudSee {
@@ -74,6 +71,7 @@ public class DealCloudSee {
             scanRecord.setIsFinish(1);
             scanRecord.setScanFinishDate(new Date());
             scanRecordService.updateByUserId(scanRecord);
+            scanRecordService.updateScanDateById(scanRecord.getId());
      /*       scheduleUtils.scheduleSendMessage(userId,"您提交的"+startHead+startNUm+"的任务已扫描完成");*/
             logger.info("用户："+userId+" 已扫描完成， 扫描结束为："+endNUm);
 

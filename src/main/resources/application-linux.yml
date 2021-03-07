@@ -5,6 +5,7 @@ bot:
   token: 1375825521:AAEU1pio1gsTxp4glYVV6x1q5VktDDck7Ys
   username: fulihao_bot
   blackword: 2
+  isLinux: true
 
 file:
   #outputpath: C:\\Users\\Administrator\\Documents\\
@@ -21,9 +22,9 @@ server:
 
 mythread:
   #核心线程数量
-  corepoolsize: 600
+  corepoolsize: 500
   #最大线程数量
-  maxpoolsize: 620
+  maxpoolsize: 600
   #队列长度
   queuecapacity: 99999999
 
@@ -51,4 +52,5 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml  #对应mapper映射xml文件所在路径
   map-underscore-to-camel-case: true
   type-aliases-package: com.github.xabgesagtx.example.entity  #对应实体类路径
+
 

@@ -283,13 +283,4 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
         }
     }
 
-    @Override
-    public void scheduleSendMessage(Integer userid,String text){
-        SendMessage sendMessage = new SendMessage().setChatId(String.valueOf(userid)).setText(text);
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            logger.error("发送文本<<"+sendMessage.getText().toString()+">>失败，具体原因：" + e.toString());
-        }
-    }
 }
