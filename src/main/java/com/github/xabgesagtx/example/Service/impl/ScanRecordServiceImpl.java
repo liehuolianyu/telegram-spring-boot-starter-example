@@ -55,4 +55,12 @@ public class ScanRecordServiceImpl implements ScanRecordService {
         return scanRecordMapper.updateScanDateById(id);
     }
 
+    @Override
+    public Integer updateScanResult(Integer id ,Integer is_finish) {
+        ScanRecord scanRecord = new ScanRecord();
+        scanRecord.setId(id);
+        scanRecord.setIsFinish(is_finish);
+        return scanRecordMapper.updateByPrimaryKeySelective(scanRecord);
+    }
+
 }

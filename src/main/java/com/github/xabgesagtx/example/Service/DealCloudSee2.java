@@ -26,7 +26,7 @@ public class DealCloudSee2 {
     ScanRecordServiceImpl scanRecordService ;
 
     @Autowired
-    cloudSeeScan cloudSeeScan;
+    CloudSeeScan cloudSeeScan;
 
     @Value("${file.count}")
     private  Integer ALL_Count;

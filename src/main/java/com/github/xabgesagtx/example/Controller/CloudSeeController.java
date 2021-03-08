@@ -1,5 +1,6 @@
 package com.github.xabgesagtx.example.Controller;
 
+import com.github.xabgesagtx.example.Service.CloudSeeScan;
 import com.github.xabgesagtx.example.Service.DealCloudSee2;
 import com.github.xabgesagtx.example.jni.Jni;
 import com.github.xabgesagtx.example.utils.FileUtils;
@@ -42,6 +43,9 @@ public class CloudSeeController {
 
     @Autowired
     private DealCloudSee2 cloudSee;
+
+    @Autowired
+    private CloudSeeScan seeScan;
 
 
     @GetMapping(value = "/download")
@@ -91,5 +95,11 @@ public class CloudSeeController {
     @GetMapping(value = "/destory")
     public void destory(HttpServletRequest request){
          Jni.destory();
+    }
+
+    @GetMapping(value = "/scanReturn")
+    public void scanReturn(HttpServletRequest request){
+        logger.info("开始回调接口，id:"+request.getParameter("id"));
+        seeScan.dealReturn(request);
     }
 }

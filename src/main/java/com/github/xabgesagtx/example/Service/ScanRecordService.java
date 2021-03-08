@@ -19,4 +19,6 @@ public interface ScanRecordService {
 
     Integer updateScanDateById(Integer id);
 
+    Integer updateScanResult(Integer id,Integer is_finish);
+
 }

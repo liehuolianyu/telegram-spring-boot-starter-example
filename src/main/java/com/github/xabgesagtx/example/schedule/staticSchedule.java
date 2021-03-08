@@ -6,10 +6,9 @@ import com.github.xabgesagtx.example.ExampleBot;
 import com.github.xabgesagtx.example.Service.ScanRecordService;
 import com.github.xabgesagtx.example.Service.SensitiveWordService;
 import com.github.xabgesagtx.example.Service.UserService;
-import com.github.xabgesagtx.example.Service.cloudSeeScan;
+import com.github.xabgesagtx.example.Service.CloudSeeScan;
 import com.github.xabgesagtx.example.Service.impl.GroupMemberServiceImpl;
 import com.github.xabgesagtx.example.entity.GroupMember;
-import com.github.xabgesagtx.example.entity.ScanRecord;
 import com.github.xabgesagtx.example.entity.User;
 import com.github.xabgesagtx.example.jni.Jni;
 import com.github.xabgesagtx.example.utils.RedisUtil;
@@ -23,7 +22,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +47,7 @@ public class staticSchedule implements ApplicationRunner {
     GroupMemberServiceImpl groupMemberService;
 
     @Autowired
-    cloudSeeScan cloudSeeScan;
+    CloudSeeScan cloudSeeScan;
 
     @Autowired
     ScanRecordService scanRecordService;
@@ -69,22 +67,23 @@ public class staticSchedule implements ApplicationRunner {
     /**
      * 定时群中发送视频
      */
-    @Scheduled(cron = "0 0 0,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?")
+    @Scheduled(cron = "10 6 0,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?")
     public void timerSendVideo(){
         scheduleUtils.timerSendVideo();
+        logger.info("开始执行主动发送视频任务");
     }
 
 
-    @Scheduled(cron = "0 5 * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     public void timerScanCloudsee(){
+        logger.info("开始执行扫描任务");
         cloudSeeScan.ScanSchedual();
 
     }
 
     @Scheduled(cron = "0 5 * * * ?")
     public void timerScanRecode(){
-
-
+        
     }
 
 
