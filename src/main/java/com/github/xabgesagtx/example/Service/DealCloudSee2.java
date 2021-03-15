@@ -25,8 +25,8 @@ public class DealCloudSee2 {
     @Autowired
     ScanRecordServiceImpl scanRecordService ;
 
-    @Autowired
-    CloudSeeScan cloudSeeScan;
+/*    @Autowired
+    CloudSeeScan cloudSeeScan;*/
 
     @Value("${file.count}")
     private  Integer ALL_Count;
@@ -123,13 +123,15 @@ public class DealCloudSee2 {
     }
 
 
-    public SendMessage dealMessage(Message message) {
+    public SendMessage dealMessage(Message message,boolean is_admin) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId());
-        if (scanRecordService.hasRecord(message.getFrom().getId())) {
-            sendMessage.setChatId(message.getChatId()).setText(OutputLine.line4);
-        } else {
-            String startName = message.getText().substring(5);
+         if (!is_admin && scanRecordService.hasRecord(message.getFrom().getId())) {
+                sendMessage.setChatId(message.getChatId()).setText(OutputLine.line4);
+            }
+        else {
+
+            String startName = message.getText().replace("/scan","").trim();
            String[] str =  startName.trim().split("&");
            if (str == null ){
                sendMessage.setText(OutputLine.line6);

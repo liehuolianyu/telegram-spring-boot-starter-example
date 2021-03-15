@@ -23,6 +23,17 @@ public class ScanRecord {
 
     private Integer downloadFlag;
 
+    private Integer resultCount;
+
+
+    public Integer getResultCount() {
+        return resultCount;
+    }
+
+    public void setResultCount(Integer resultCount) {
+        this.resultCount = resultCount;
+    }
+
     public Integer getId() {
         return id;
     }

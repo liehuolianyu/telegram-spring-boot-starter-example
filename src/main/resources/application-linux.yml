@@ -5,7 +5,8 @@ bot:
   token: 1375825521:AAEU1pio1gsTxp4glYVV6x1q5VktDDck7Ys
   username: fulihao_bot
   blackword: 2
-  isLinux: true
+  #用于是否初始化sdk
+  isLinux: false
 
 file:
   #outputpath: C:\\Users\\Administrator\\Documents\\

@@ -3,6 +3,7 @@ package com.github.xabgesagtx.example.Service;
 
 import com.github.xabgesagtx.example.Service.impl.ScanRecordServiceImpl;
 import com.github.xabgesagtx.example.entity.ScanRecord;
+import com.github.xabgesagtx.example.utils.ScheduleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,16 @@ public class CloudSeeScan {
     @Autowired
     ScanRecordService scanRecordService;
 
+    @Autowired
+    ScheduleUtils scheduleUtils;
+
     @Value("${file.sleep}")
     private Long SLEEP_TIME;
 
     @Value("${file.outputpath}")
     private String FILE_PATH;
+
+
 
 
     @Async
@@ -74,7 +80,7 @@ public class CloudSeeScan {
 
                 try {
                     httpsPost.get("http://test.yangge666.top:8083/cloudsee/scanNew?name=" + startNum + "&head=" + startHead + "&count=" + (endNUm - startNum) + "&id=" + id);
-                    scanRecordService.updateScanResult(record.getId(),1);
+                    scanRecordService.updateScanResult(record.getId(),1,0);
                     logger.info("请求地址:http://test.yangge666.top:8083/cloudsee/scanNew?name=" + startNum + "&head=" + startHead + "&count=" + (endNUm - startNum) + "&id=" + id);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -103,7 +109,10 @@ public class CloudSeeScan {
 
     public void dealReturn(HttpServletRequest request){
         String id = request.getParameter("id");
-        scanRecordService.updateScanResult(Integer.valueOf(id),2);
+        String count = request.getParameter("count");
+        scanRecordService.updateScanResult(Integer.valueOf(id),2,Integer.valueOf(count));
+        ScanRecord scanRecord = scanRecordService.selectById(Integer.valueOf(id));
+        scheduleUtils.timerSendMessage("任务id: "+id+" 已扫描完成，请私聊机器人获取扫描结果");
 
     }
 }

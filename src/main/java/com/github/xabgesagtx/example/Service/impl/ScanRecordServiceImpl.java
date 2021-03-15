@@ -56,11 +56,17 @@ public class ScanRecordServiceImpl implements ScanRecordService {
     }
 
     @Override
-    public Integer updateScanResult(Integer id ,Integer is_finish) {
+    public Integer updateScanResult(Integer id ,Integer is_finish,Integer resultCount) {
         ScanRecord scanRecord = new ScanRecord();
         scanRecord.setId(id);
         scanRecord.setIsFinish(is_finish);
+        scanRecord.setResultCount(resultCount);
         return scanRecordMapper.updateByPrimaryKeySelective(scanRecord);
+    }
+
+    @Override
+    public ScanRecord selectById(Integer id) {
+        return scanRecordMapper.selectByPrimaryKey(id);
     }
 
 }

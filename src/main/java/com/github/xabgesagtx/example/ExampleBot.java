@@ -137,6 +137,8 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
 
 
                         }
+                    }else if (message.getText().startsWith("/scan")){
+
                     }
                 }
             } else {
@@ -147,7 +149,7 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
                 if (userServiceimpl.isAdmin(message.getFrom().getId())) {
                     if (message.hasText()) {
                         if (message.getText().startsWith(OutputLine.scan)) {
-                            sendMessage(cloudSee2.dealMessage(message));
+                            sendMessage(cloudSee2.dealMessage(message,true));
                         } else if (message.getText().startsWith(OutputLine.addSensitiveWord)){
                             sendMessage(textMessage.add(message));
                         }
@@ -238,6 +240,17 @@ public class ExampleBot extends TelegramLongPollingBot implements ScheduleUtils 
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void timerSendMessage(String message) {
+        List<ChatList> chatLists = chatListService.selectAll();
+        for (ChatList chatList : chatLists){
+           SendMessage sendMessage = new SendMessage();
+           sendMessage.setChatId(chatList.getId()).setText(message);
+           sendMessage(sendMessage);
+
         }
     }
 

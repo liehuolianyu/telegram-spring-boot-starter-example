@@ -7,5 +7,6 @@ public interface ScheduleUtils {
 
     public void timerSendVideo();
 
+    public void timerSendMessage(String message);
 
 }
